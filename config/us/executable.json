@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "magic": "PS-X EXE",
+  "entrypoint": "0x80096520",
+  "global_pointer": "0x00000000",
+  "load_address": "0x80010000",
+  "payload_size": "0x0008F800",
+  "stack_address": "0x801FFFF0",
+  "region_marker": "Sony Computer Entertainment Inc. for North America area",
+  "sha1": "979ccf0ae0027a569a35a08f38e5d58a00d8db9b",
+  "sha256": "892f8482d3c9b163f45afae50676808e5673bdb7d6c079663cc1fdf6826b236f"
+}

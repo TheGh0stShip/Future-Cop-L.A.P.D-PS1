@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "compiler": "gcc-2.8.1-psx",
+  "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G0", "-fgnu-linker", "-O2"],
+  "maspsx_flags": ["--dont-expand-li"],
+  "units": [
+    {
+      "name": "func_80019D88",
+      "address": "0x80019D88",
+      "size": "0x8",
+      "source": "src/game/80019D88.c",
+      "symbols": {}
+    }
+  ]
+}

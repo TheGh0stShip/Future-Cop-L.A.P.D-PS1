@@ -1,0 +1,31 @@
+{
+  "cue_path": "/home/steve/projects/Future Cop LAPD/Future Cop - L.A.P.D. (USA)/Future Cop - L.A.P.D. (USA).cue",
+  "cue_name": "Future Cop - L.A.P.D. (USA).cue",
+  "bin_name": "Future Cop - L.A.P.D. (USA).bin",
+  "track_count": 1,
+  "data_track_size": 351718080,
+  "data_track_md5": "57712fcfb39a6528672356bc53e2b0a9",
+  "data_track_sha1": "e27204e4415a6eb8179fbb0c6294149e829d507e",
+  "data_track_crc32": "dd21d336",
+  "boot_exe": "SLUS_007.39",
+  "serial": "SLUS-00739",
+  "serial_exe": "SLUS_007.39",
+  "volume_id": "SLUS-00739",
+  "display_name": "Future Cop: L.A.P.D.",
+  "load_address": "0x80010000",
+  "entry_pc": "0x80096520",
+  "text_size": "0x0008F800",
+  "stack_base": "0x801FFFF0",
+  "require_cue": true,
+  "required_disc_fp": "46acedc25f4a67274ff976acdcac438b97152e850fce6514ce2096ee38d2bb32",
+  "boot_exe_sha256": "892f8482d3c9b163f45afae50676808e5673bdb7d6c079663cc1fdf6826b236f",
+  "seed_count": 1481,
+  "warnings": [
+    "cue has only 1 TRACK \u2014 Track-01-only dumps fail multi-track netplay/catalog gates; prefer a full Redump cue."
+  ],
+  "notes": [
+    "entry_pc/load_address/text_size/stack_base taken from PS-X EXE header.",
+    "seeds are first-pass boot-EXE JAL targets (+ entry); expect to grow as overlays / runtime paths are discovered.",
+    "required_disc_fp is psxrecomp-toc-v1 (matches runtime DiscIdentity)."
+  ]
+}

@@ -1,0 +1,14 @@
+/build/
+/generated/
+/baseroms/
+/.venv/
+/.toolchain/
+/.splache/
+/asm/
+__pycache__/
+*.pyc
+*.bin
+*.cue
+*.chd
+*.iso
+*.exe

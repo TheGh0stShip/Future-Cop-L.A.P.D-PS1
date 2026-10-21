@@ -1,0 +1,32 @@
+name: Future Cop LAPD (USA)
+sha1: 979ccf0ae0027a569a35a08f38e5d58a00d8db9b
+
+options:
+  basename: future_cop_lapd
+  target_path: baseroms/us/SLUS_007.39
+  base_path: ../..
+  platform: psx
+  compiler: PSYQ
+  asm_path: asm/us
+  src_path: src
+  build_path: build/us
+  ld_script_path: build/us/future_cop_lapd.ld
+  create_undefined_funcs_auto: true
+  create_undefined_syms_auto: true
+  symbol_addrs_path: config/us/symbol_addrs.txt
+  undefined_funcs_auto_path: build/us/undefined_funcs_auto.txt
+  undefined_syms_auto_path: build/us/undefined_syms_auto.txt
+  find_file_boundaries: false
+  gp_value: 0
+
+segments:
+  - name: psx_header
+    type: bin
+    start: 0x0
+  - name: main
+    type: code
+    start: 0x800
+    vram: 0x80010000
+    subsegments:
+      - [0x800, asm, main]
+  - [0x90000]
