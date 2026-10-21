@@ -1,5 +1,9 @@
 # Future Cop: L.A.P.D. (USA) matching decompilation
 
+[![Code](https://img.shields.io/badge/code-172%2F555552-red)](https://bytematch.dev/TheGh0stShip/Future-Cop-L.A.P.D-PS1)
+[![Functions](https://img.shields.io/badge/functions-18%2F1886-red)](https://bytematch.dev/TheGh0stShip/Future-Cop-L.A.P.D-PS1)
+[![Verify](https://github.com/TheGh0stShip/Future-Cop-L.A.P.D-PS1/actions/workflows/verify.yml/badge.svg)](https://github.com/TheGh0stShip/Future-Cop-L.A.P.D-PS1/actions/workflows/verify.yml)
+
 An in-progress, byte-matching C reconstruction of the North American
 PlayStation release (`SLUS-00739`). The target is a user-supplied
 `Future Cop - L.A.P.D. (USA).cue` / `.bin`; no retail game data belongs in the
@@ -17,6 +21,7 @@ matching C.
 ```sh
 make function-inventory
 make verify-matching
+make report
 make check
 ```
 
@@ -24,6 +29,13 @@ The Makefile expects the image in `Future Cop - L.A.P.D. (USA)/`. Retail inputs,
 extracted files, assembly, toolchains, and build output are ignored. Matching
 source lives under `src/`; its address, size, compiler profile, and symbols are
 declared in `config/us/matching_units.json`.
+
+`make report` writes an objdiff v2 progress report to `build/report.json`.
+The default-branch workflow publishes it as `SLUS-00739_report` for
+[ByteMatch](https://bytematch.dev/TheGh0stShip/Future-Cop-L.A.P.D-PS1) and
+compatible public progress trackers. The current denominator is the audited
+static-analysis catalogue: 1,886 non-data, non-alias function ranges covering
+555,552 bytes. Only units that pass the retail-byte verifier receive progress.
 
 ## Prior art gate
 

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://recomp.fyi/schema/v1.json",
+  "game": "Future Cop: L.A.P.D.",
+  "wikidata": "Q1643114",
+  "system": "PS1",
+  "type": "decomp",
+  "original": {
+    "region": "USA",
+    "revision": "SLUS-00739",
+    "serial": "SLUS-00739",
+    "sha1": "979ccf0ae0027a569a35a08f38e5d58a00d8db9b"
+  },
+  "project": "Future Cop: L.A.P.D. (PS1) matching decompilation",
+  "status": "in-progress",
+  "toolchain": [
+    "Splat"
+  ],
+  "approach": "Matching C decompilation with byte-exact verification against the North American executable.",
+  "notes": "Progress credits only source units verified byte-for-byte against SLUS-00739.",
+  "maintainers": [
+    {
+      "name": "TheGh0stShip",
+      "link": "https://github.com/TheGh0stShip"
+    }
+  ],
+  "links": [
+    {
+      "label": "Repository",
+      "url": "https://github.com/TheGh0stShip/Future-Cop-L.A.P.D-PS1"
+    },
+    {
+      "label": "ByteMatch",
+      "url": "https://bytematch.dev/TheGh0stShip/Future-Cop-L.A.P.D-PS1"
+    }
+  ],
+  "tags": [
+    "matching",
+    "MIPS"
+  ]
+}

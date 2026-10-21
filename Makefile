@@ -7,7 +7,7 @@ VENV_PYTHON := $(VENV)/bin/python
 VENV_STAMP := $(VENV)/.installed
 EXE := baseroms/us/SLUS_007.39
 
-.PHONY: all setup toolchain verify split function-inventory verify-matching check extract inventory clean
+.PHONY: all setup toolchain verify split function-inventory verify-matching report check extract inventory clean
 
 all: split
 
@@ -41,7 +41,10 @@ verify-matching: verify toolchain
 	LD_LIBRARY_PATH="$(CURDIR)/.toolchain/mipsel-binutils/root/usr/lib/x86_64-linux-gnu$${LD_LIBRARY_PATH:+:$$LD_LIBRARY_PATH}" \
 	$(PYTHON) tools/verify_matching_units.py
 
-check: verify function-inventory verify-matching
+report:
+	$(PYTHON) tools/generate_decomp_report.py
+
+check: verify function-inventory verify-matching report
 	$(PYTHON) -m unittest discover -s tests -t . -v
 
 extract: $(FILES)/.extracted
