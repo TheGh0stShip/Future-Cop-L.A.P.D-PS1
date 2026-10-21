@@ -10,7 +10,7 @@ repository.
 The current scaffold verifies the exact USA executable, extracts the disc,
 splits 100% of the executable with Splat, inventories provisional function
 starts, pins the PSX compiler toolchain, and compares reviewed C units directly
-to retail bytes. One 8-byte function currently matches. Provisional assembly,
+to retail bytes. Ten functions totaling 80 bytes currently match. Provisional assembly,
 generated static-recompiler output, and boundary guesses do not count as
 matching C.
 

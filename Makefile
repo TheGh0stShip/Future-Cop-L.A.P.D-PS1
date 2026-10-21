@@ -46,12 +46,13 @@ check: verify function-inventory verify-matching
 
 extract: $(FILES)/.extracted
 
-$(ISO): $(BIN) tools/extract_mode2.py
+$(ISO): tools/extract_mode2.py | $(BIN)
 	@mkdir -p build/disc
 	python3 tools/extract_mode2.py "$<" "$@"
 
 $(FILES)/.extracted: $(ISO)
 	@mkdir -p "$(FILES)"
+	@chmod -R u+w "$(FILES)" 2>/dev/null || true
 	xorriso -osirrox on -indev "$(ISO)" -extract / "$(abspath $(FILES))"
 	@touch "$@"
 
