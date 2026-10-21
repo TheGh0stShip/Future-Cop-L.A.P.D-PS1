@@ -37,6 +37,12 @@ compatible public progress trackers. The current denominator is the audited
 static-analysis catalogue: 1,886 non-data, non-alias function ranges covering
 555,552 bytes. Only units that pass the retail-byte verifier receive progress.
 
+For unattended local candidate searches, see the
+[offline decompilation worker](docs/OFFLINE_DECOMP.md). It runs resumable,
+parallel compiler-guided campaigns against a local proposal command, keeps all
+generated work under ignored `build/` paths, and places only exact-byte results
+in a review inbox. It never edits tracked source or updates progress itself.
+
 ## Prior art gate
 
 Public research found two relevant projects as of 2026-10-21:

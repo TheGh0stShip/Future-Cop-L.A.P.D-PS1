@@ -57,7 +57,7 @@ def validate(config):
             raise ValueError(f"overlapping units: {left[2]} and {right[2]}")
 
 
-def compile_unit(unit, config, prefix, work):
+def compile_unit(unit, config, prefix, work, environment=None):
     compiler = unit.get("compiler", config["compiler"])
     cc1 = ROOT / ".toolchain" / compiler / "cc1"
     if not cc1.is_file():
@@ -73,19 +73,21 @@ def compile_unit(unit, config, prefix, work):
     cpp = ROOT / ".toolchain" / compiler / "cpp"
     if not cpp.is_file():
         raise SystemExit(f"missing {cpp}; run make toolchain")
-    run([cpp, "-lang-c", source, preprocessed])
-    run([cc1, *flags, preprocessed, "-o", raw_asm])
+    run([cpp, "-lang-c", "-I", ROOT / "include", source, preprocessed], env=environment)
+    run([cc1, *flags, preprocessed, "-o", raw_asm], env=environment)
 
     maspsx = ROOT / ".toolchain" / f"maspsx-{MASPSX_COMMIT}" / "maspsx.py"
     with processed.open("w") as output:
         run(["python3", maspsx, *unit.get("maspsx_flags", config["maspsx_flags"]),
-             raw_asm], stdout=output)
+             raw_asm], stdout=output, env=environment)
     definitions = "".join(f".set {name}, {number(value):#x}\n"
                           for name, value in sorted(unit["symbols"].items()))
     linked_asm.write_text(definitions + processed.read_text())
 
-    run([tool("as", prefix), "-EL", "-march=r3000", "-mabi=32", "-o", obj, linked_asm])
-    run([tool("objcopy", prefix), "-O", "binary", "-j", ".text", obj, binary])
+    run([tool("as", prefix), "-EL", "-march=r3000", "-mabi=32", "-o", obj, linked_asm],
+        env=environment)
+    run([tool("objcopy", prefix), "-O", "binary", "-j", ".text", obj, binary],
+        env=environment)
     return binary.read_bytes()
 
 

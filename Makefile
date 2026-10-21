@@ -7,7 +7,7 @@ VENV_PYTHON := $(VENV)/bin/python
 VENV_STAMP := $(VENV)/.installed
 EXE := baseroms/us/SLUS_007.39
 
-.PHONY: all setup toolchain verify split function-inventory verify-matching report check extract inventory clean
+.PHONY: all setup toolchain verify split function-inventory verify-matching report check extract inventory offline-decomp-status clean
 
 all: split
 
@@ -64,6 +64,9 @@ inventory: extract
 	find "$(FILES)" -type f ! -name .extracted -printf '%P\t%s\n' | sort > build/inventory/files.tsv
 	find "$(FILES)" -type f ! -name .extracted -print0 | sort -z | xargs -0 sha256sum > build/inventory/sha256.txt
 	python3 tools/inspect_psx_exe.py "$(FILES)/SLUS_007.39" > build/inventory/psx-exe.txt
+
+offline-decomp-status:
+	$(PYTHON) tools/offline_decomp.py status
 
 clean:
 	rm -rf build
