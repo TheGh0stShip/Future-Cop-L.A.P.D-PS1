@@ -47,7 +47,7 @@ Sources:
 
 GCC 2.8.1 PSX with `-O2 -G0` is the leading hypothesis, based on the matching
 pipeline proven in the read-only BattleTanx: Global Assault PS1 project and the
-first eighteen exact Future Cop leaf functions. GCC 2.7.2 PSX remains pinned for
+first thirty-three exact Future Cop leaf functions. GCC 2.7.2 PSX remains pinned for
 per-unit testing. These trivial matches do not establish the compiler for game-owned
 non-leaf functions; stack layout, register allocation, switch lowering,
 division, GTE scheduling, and small-data behavior still require representative
