@@ -63,13 +63,18 @@ def compile_unit(unit, config, prefix, work):
     if not cc1.is_file():
         raise SystemExit(f"missing {cc1}; run make toolchain")
     source = ROOT / unit["source"]
+    preprocessed = work / "unit.i"
     raw_asm = work / "raw.s"
     processed = work / "processed.s"
     linked_asm = work / "linked.s"
     obj = work / "unit.o"
     binary = work / "unit.bin"
     flags = unit.get("compiler_flags", config["compiler_flags"])
-    run([cc1, *flags, source, "-o", raw_asm])
+    cpp = ROOT / ".toolchain" / compiler / "cpp"
+    if not cpp.is_file():
+        raise SystemExit(f"missing {cpp}; run make toolchain")
+    run([cpp, "-lang-c", source, preprocessed])
+    run([cc1, *flags, preprocessed, "-o", raw_asm])
 
     maspsx = ROOT / ".toolchain" / f"maspsx-{MASPSX_COMMIT}" / "maspsx.py"
     with processed.open("w") as output:
@@ -84,11 +89,12 @@ def compile_unit(unit, config, prefix, work):
     return binary.read_bytes()
 
 
-def verify(config_path, executable_path, output_path, prefix):
+def verify(config_path, executable_path, output_path, prefix, keep_going=False):
     config = json.loads(config_path.read_text())
     validate(config)
     executable = executable_path.read_bytes()
     results = []
+    failures = []
     with tempfile.TemporaryDirectory(prefix="future-cop-match-") as directory:
         for index, unit in enumerate(config["units"]):
             work = Path(directory) / str(index)
@@ -101,11 +107,18 @@ def verify(config_path, executable_path, output_path, prefix):
                 raise ValueError(f"{unit['name']}: range outside executable")
             if len(actual) < size:
                 actual += bytes(size - len(actual))
+            failure = None
             if any(actual[size:]):
-                raise SystemExit(f"{unit['name']} emitted nonzero bytes after its extent")
-            if actual[:size] != expected:
+                failure = f"emitted nonzero bytes after its extent"
+            elif actual[:size] != expected:
                 mismatch = next(i for i in range(size) if actual[i] != expected[i])
-                raise SystemExit(f"{unit['name']} differs at +0x{mismatch:X}")
+                failure = f"differs at +0x{mismatch:X}"
+            if failure is not None:
+                if not keep_going:
+                    raise SystemExit(f"{unit['name']} {failure}")
+                failures.append({"name": unit["name"], "reason": failure})
+                print(f"FAIL {unit['name']}: {failure}")
+                continue
             results.append({"name": unit["name"], "address": address, "size": size,
                             "source_sha256": hashlib.sha256(
                                 (ROOT / unit["source"]).read_bytes()).hexdigest(),
@@ -113,7 +126,8 @@ def verify(config_path, executable_path, output_path, prefix):
             print(f"PASS {unit['name']}: {size} bytes")
     report = {"schema": 1, "compiler": config["compiler"],
               "matched_bytes": sum(row["size"] for row in results),
-              "matched_functions": len(results), "units": results}
+              "matched_functions": len(results), "units": results,
+              "failures": failures}
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     return report
@@ -125,5 +139,9 @@ if __name__ == "__main__":
     parser.add_argument("--executable", type=Path, default=Path("baseroms/us/SLUS_007.39"))
     parser.add_argument("--output", type=Path, default=Path("build/us/matching_report.json"))
     parser.add_argument("--binutils-prefix", default=os.environ.get("MIPSEL_PREFIX", "mipsel-linux-gnu-"))
+    parser.add_argument("--keep-going", action="store_true")
     args = parser.parse_args()
-    verify(args.config, args.executable, args.output, args.binutils_prefix)
+    report = verify(args.config, args.executable, args.output, args.binutils_prefix,
+                    keep_going=args.keep_going)
+    if report["failures"]:
+        raise SystemExit(1)

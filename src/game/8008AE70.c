@@ -1,13 +1,7 @@
-struct CommandFields {
-    unsigned char pad_00[0x28];
-    int value;
-    unsigned char pad_2C[8];
-    unsigned char type;
-};
+#include "../../include/game/command_state.h"
 
-void func_8008AE70(struct CommandFields *fields, int value,
-                   unsigned char type)
+void func_8008AE70(struct CommandState *state, int value, u8 type)
 {
-    fields->value = value;
-    fields->type = type;
+    *(int *)&state->inline_data[4] = value;
+    state->type = type;
 }

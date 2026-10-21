@@ -1,8 +1,4 @@
-struct CommandState {
-    unsigned char pad_00[0x36];
-    unsigned char current;
-    unsigned char previous;
-};
+#include "../../include/game/command_state.h"
 
 int func_8008C06C(struct CommandState *state)
 {
