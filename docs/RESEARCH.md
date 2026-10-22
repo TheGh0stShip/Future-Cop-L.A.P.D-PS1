@@ -98,3 +98,7 @@ actuator-map builder at `0x8008B508` add a further 368 exact bytes under the
 The intervening 212-byte initializer at `0x8008B094` is `_padLoadActInfo`; it
 lays out the mode, capability, and combination tables within a caller-provided
 buffer and installs the two command-processing callbacks.
+Its 628-byte response processor at `0x8008B210` reconstructs mode-table rows,
+five-byte actuator capability records, and variable-length combination data.
+It matches under GCC 2.7.2 and confirms `D_800A3B80` as the active combination
+payload cursor.
