@@ -8,14 +8,14 @@ class DecompReportTests(unittest.TestCase):
         report = build_report()
         measures = report["measures"]
         self.assertEqual(report["version"], 2)
-        self.assertEqual(measures["matched_code"], "39260")
+        self.assertEqual(measures["matched_code"], "39404")
         self.assertEqual(measures["total_code"], "555552")
-        self.assertEqual(measures["matched_functions"], 451)
+        self.assertEqual(measures["matched_functions"], 452)
         self.assertEqual(measures["total_functions"], 1858)
         self.assertEqual(measures["total_data"], "305279768")
         self.assertEqual(measures["matched_data"], "27648404")
         self.assertEqual(
-            sum(unit["metadata"]["complete"] for unit in report["units"]), 451
+            sum(unit["metadata"]["complete"] for unit in report["units"]), 452
         )
         categories = {item["id"]: item["measures"] for item in report["categories"]}
         self.assertEqual(categories["executable_data"]["total_data"], "32224")
