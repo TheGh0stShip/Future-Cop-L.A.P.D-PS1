@@ -14,13 +14,17 @@ struct ParentNode {
 
 void **func_8003D9C4(struct ParentNode *parent)
 {
-    struct ChildNode *node = parent->node;
+    struct ChildNode *node;
+    void **result;
 
-    if (node == 0) {
-        return &parent->fallback;
+    node = parent->node;
+    if (node != 0) {
+        result = (void **)((u8 *)node + 4);
+        if (node->child != 0) {
+            result = (void **)((u8 *)node->child + 4);
+        }
+    } else {
+        result = &parent->fallback;
     }
-    if (node->child != 0) {
-        return (void **)((u8 *)node->child + 4);
-    }
-    return (void **)((u8 *)node + 4);
+    return result;
 }

@@ -41,13 +41,6 @@
       }
     },
     {
-      "name": "func_8003D9C4",
-      "address": "0x8003D9C4",
-      "size": "0x34",
-      "source": "src/game/8003D9C4.c",
-      "symbols": {}
-    },
-    {
       "name": "func_80045028",
       "address": "0x80045028",
       "size": "0x28",

@@ -549,6 +549,14 @@
       }
     },
     {
+      "name": "func_8003D9C4",
+      "address": "0x8003D9C4",
+      "size": "0x34",
+      "source": "src/game/8003D9C4.c",
+      "compiler": "gcc-2.7.2-cdk",
+      "symbols": {}
+    },
+    {
       "name": "func_8003F428",
       "address": "0x8003F428",
       "size": "0x78",
