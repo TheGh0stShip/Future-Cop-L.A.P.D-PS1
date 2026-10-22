@@ -783,6 +783,72 @@ def normalize_aspsx_shared_byte_store_return(text):
     return text
 
 
+def normalize_aspsx_color_ramp_schedule(text):
+    """Restore the retail scheduling of the 15-bit color-ramp loop."""
+    setup = re.compile(
+        r"addiu\t\$2,\$2,%lo\(([^)]+)\)[^\n]*\n"
+        r"li\t\$25,10[^\n]*\n"
+        r"li\t\$24,5[^\n]*\n"
+        r"sll\t\$3,\$4,\$24\n"
+        r"addu\t\$3,\$2,\$3\n"
+    )
+    match = setup.search(text)
+    if match is None:
+        raise ValueError("ASPSX color-ramp setup pattern not found")
+    symbol = match.group(1)
+    replacement = (
+        "li\t$25,10\n"
+        "li\t$24,5\n"
+        f"addiu\t$2,$2,%lo({symbol})\n"
+        "sll\t$3,$4,5\n"
+        "addu\t$3,$3,$2\n"
+    )
+    text = text[:match.start()] + replacement + text[match.end():]
+
+    division = re.compile(
+        r"addu\t\$2,\$9,\$zero\n"
+        r"bgez\t\$2,(\$L[0-9A-Za-z_]+)\n"
+        r"nop[^\n]*\n"
+        r"addu\t\$2,\$2,15\n"
+        r"\1:\n"
+        r"sra\t\$2,\$2,4\n"
+        r"addu\t\$8,\$10,\$zero\n"
+        r"bgez\t\$8,(\$L[0-9A-Za-z_]+)\n"
+        r"sll\t\$3,\$2,\$25\n\n"
+        r"addu\t\$8,\$8,15\n"
+        r"\2:\n"
+        r"sra\t\$2,\$8,4\n"
+        r"addu\t\$4,\$11,\$zero\n"
+        r"bgez\t\$4,(\$L[0-9A-Za-z_]+)\n"
+        r"sll\t\$8,\$2,\$24\n\n"
+        r"addu\t\$4,\$4,15\n"
+        r"\3:\n"
+    )
+    match = division.search(text)
+    if match is None:
+        raise ValueError("ASPSX color-ramp division pattern not found")
+    first, second, third = match.groups()
+    replacement = (
+        f"bgez\t$9,{first}\n"
+        "addu\t$2,$9,$zero\n"
+        "addu\t$2,$9,15\n"
+        f"{first}:\n"
+        "addu\t$8,$10,$zero\n"
+        "sra\t$2,$2,4\n"
+        f"bgez\t$10,{second}\n"
+        "sll\t$3,$2,$25\n\n"
+        "addu\t$8,$10,15\n"
+        f"{second}:\n"
+        "addu\t$4,$11,$zero\n"
+        "sra\t$2,$8,4\n"
+        f"bgez\t$11,{third}\n"
+        "sll\t$8,$2,$24\n\n"
+        "addu\t$4,$11,15\n"
+        f"{third}:\n"
+    )
+    return text[:match.start()] + replacement + text[match.end():]
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -888,6 +954,10 @@ def validate(config):
         if not isinstance(unit.get("aspsx_shared_byte_store_return", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_shared_byte_store_return must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_color_ramp_schedule", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_color_ramp_schedule must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -1015,6 +1085,10 @@ def compile_unit(unit, config, prefix, work, environment=None):
     if unit.get("aspsx_shared_byte_store_return", False):
         processed.write_text(
             normalize_aspsx_shared_byte_store_return(processed.read_text())
+        )
+    if unit.get("aspsx_color_ramp_schedule", False):
+        processed.write_text(
+            normalize_aspsx_color_ramp_schedule(processed.read_text())
         )
     if marker_lines:
         marker_names = set(small_data_symbols)

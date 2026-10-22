@@ -11,6 +11,7 @@ from tools.verify_matching_units import (
     normalize_aspsx_indexed_byte_access,
     normalize_aspsx_line_packet,
     normalize_aspsx_context_wrapper,
+    normalize_aspsx_color_ramp_schedule,
     normalize_aspsx_packet_cursor,
     normalize_aspsx_shared_byte_store_return,
     reorder_aspsx_argument_save_groups,
@@ -27,6 +28,28 @@ from tools.verify_matching_units import (
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_normalizes_color_ramp_setup_and_divisions(self):
+        source = (
+            "addiu\t$2,$2,%lo(D_colors) # low\n"
+            "li\t$25,10 # blue\nli\t$24,5 # green\n"
+            "sll\t$3,$4,$24\naddu\t$3,$2,$3\n"
+            "addu\t$2,$9,$zero\nbgez\t$2,$L1\nnop # delay\n"
+            "addu\t$2,$2,15\n$L1:\nsra\t$2,$2,4\n"
+            "addu\t$8,$10,$zero\nbgez\t$8,$L2\nsll\t$3,$2,$25\n\n"
+            "addu\t$8,$8,15\n$L2:\nsra\t$2,$8,4\n"
+            "addu\t$4,$11,$zero\nbgez\t$4,$L3\nsll\t$8,$2,$24\n\n"
+            "addu\t$4,$4,15\n$L3:\nsra\t$2,$4,4\n"
+        )
+        result = normalize_aspsx_color_ramp_schedule(source)
+        self.assertTrue(result.startswith(
+            "li\t$25,10\nli\t$24,5\n"
+            "addiu\t$2,$2,%lo(D_colors)\nsll\t$3,$4,5\n"
+            "addu\t$3,$3,$2\n"
+        ))
+        self.assertIn("bgez\t$9,$L1\naddu\t$2,$9,$zero", result)
+        self.assertIn("bgez\t$10,$L2\nsll\t$3,$2,$25", result)
+        self.assertIn("bgez\t$11,$L3\nsll\t$8,$2,$24", result)
+
     def test_merges_early_return_into_terminal_byte_store(self):
         source = (
             "j\t$31\n"
