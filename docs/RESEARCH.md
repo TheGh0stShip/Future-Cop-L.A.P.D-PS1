@@ -196,3 +196,6 @@ lane. The adjacent 152-byte environment uploader proves a separate Sony GCC
 2.6.3 `-O2` lane. Its compiler output is instruction-identical; the original
 ASPSX moves the terminal stack restore into the return delay slot, a safe
 reordering that the pinned MASPSX bridge now applies only when a unit opts in.
+The same evidence-driven bridge reproduces ASPSX placement of a load-delay
+`nop` before a loop label. This resolves the 40-byte PAD status wait at
+`0x8008AE44`; without the relocation, only its branch displacement differs.

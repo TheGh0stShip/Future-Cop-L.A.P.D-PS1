@@ -61,6 +61,22 @@ def reorder_aspsx_return_delay_slot(text):
     raise ValueError("ASPSX return-delay-slot pattern not found")
 
 
+def move_aspsx_load_delay_label(text):
+    """Place a loop label after an ASPSX-inserted load-delay nop."""
+    lines = text.splitlines()
+    for index in range(len(lines) - 2):
+        label = re.fullmatch(r"\s*(\$L[0-9A-Za-z_]+):\s*", lines[index])
+        delay_nop = re.fullmatch(r"\s*nop\s+# DEBUG: Reuse of .*", lines[index + 1])
+        skipped = re.fullmatch(
+            r"\s*#\s*(\$L[0-9A-Za-z_]+):\s+# DEBUG: skipped\s*",
+            lines[index + 2],
+        )
+        if label and delay_nop and skipped and label.group(1) == skipped.group(1):
+            lines[index:index + 3] = [lines[index + 1], lines[index]]
+            return "\n".join(lines) + "\n"
+    raise ValueError("ASPSX load-delay-label pattern not found")
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -82,6 +98,10 @@ def validate(config):
         if not isinstance(unit.get("aspsx_reorder_epilogue", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_reorder_epilogue must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_move_load_delay_label", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_move_load_delay_label must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -140,6 +160,8 @@ def compile_unit(unit, config, prefix, work, environment=None):
             stdout=output, env=environment)
     if unit.get("aspsx_reorder_epilogue", False):
         processed.write_text(reorder_aspsx_return_delay_slot(processed.read_text()))
+    if unit.get("aspsx_move_load_delay_label", False):
+        processed.write_text(move_aspsx_load_delay_label(processed.read_text()))
     if marker_lines:
         marker_names = set(small_data_symbols)
         processed.write_text("\n".join(
