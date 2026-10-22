@@ -8104,6 +8104,17 @@
       "link": true,
       "linker_symbols": {"func_800222CC": "0x800222CC"},
       "symbols": {"func_800222CC": "0x800222CC"}
+    },
+    {
+      "name": "func_8003C500",
+      "address": "0x8003C500",
+      "size": "0x90",
+      "source": "src/game/8003C500.c",
+      "compiler": "gcc-2.7.2-cdk",
+      "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G0", "-fgnu-linker", "-O2"],
+      "link": true,
+      "linker_symbols": {"D_800A7040": "0x800A7040", "func_8003C4C4": "0x8003C4C4"},
+      "symbols": {"D_800A7040": "0x800A7040", "func_8003C4C4": "0x8003C4C4"}
     }
   ]
 }

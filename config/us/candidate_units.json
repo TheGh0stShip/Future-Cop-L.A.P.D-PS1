@@ -65,16 +65,6 @@
       }
     },
     {
-      "name": "func_8003C500",
-      "address": "0x8003C500",
-      "size": "0x90",
-      "source": "src/game/8003C500.c",
-      "symbols": {
-        "D_800A7040": "0x800A7040",
-        "func_8003C4C4": "0x8003C4C4"
-      }
-    },
-    {
       "name": "func_8003CDAC",
       "address": "0x8003CDAC",
       "size": "0x84",
