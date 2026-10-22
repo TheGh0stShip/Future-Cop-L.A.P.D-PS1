@@ -7,6 +7,16 @@
     {"address": "0x8003FA34", "size": "0xA0", "remove_starts": ["0x8003FA38"]},
     {"address": "0x80060E50", "size": "0x24", "remove_starts": ["0x80060E54"]},
     {"address": "0x80061860", "size": "0x6C", "remove_starts": ["0x80061864"]},
-    {"address": "0x800634F4", "size": "0x74", "remove_starts": ["0x800634F8"]}
+    {"address": "0x800634F4", "size": "0x74", "remove_starts": ["0x800634F8"]},
+    {"address": "0x800451B4", "size": "0x2C", "remove_starts": ["0x800451BC"]},
+    {"address": "0x80045370", "size": "0x48", "remove_starts": ["0x80045374"]},
+    {"address": "0x80048DEC", "size": "0x3C", "remove_starts": ["0x80048DF0"]},
+    {"address": "0x8004963C", "size": "0x54", "remove_starts": ["0x80049640"]},
+    {"address": "0x800496D0", "size": "0x64", "remove_starts": ["0x800496D4"]},
+    {"address": "0x8004ABBC", "size": "0x28", "remove_starts": ["0x8004ABC0"]},
+    {"address": "0x8004DE80", "size": "0x60", "remove_starts": ["0x8004DE88"]},
+    {"address": "0x8005A220", "size": "0x70", "remove_starts": ["0x8005A224"]},
+    {"address": "0x800734BC", "size": "0x44", "remove_starts": ["0x800734C0"]},
+    {"address": "0x8007852C", "size": "0xCC", "remove_starts": ["0x80078530"]}
   ]
 }
