@@ -161,40 +161,6 @@
       }
     },
     {
-      "name": "func_80045678",
-      "address": "0x80045678",
-      "size": "0xB4",
-      "source": "src/game/80045678.c",
-      "symbols": {
-        "D_8009F720": "0x8009F720",
-        "D_8009F724": "0x8009F724",
-        "D_800A1830": "0x800A1830",
-        "func_80045494": "0x80045494",
-        "func_800455DC": "0x800455DC"
-      },
-      "link": true,
-      "linker_symbols": {
-        "D_8009F720": "0x8009F720",
-        "D_8009F724": "0x8009F724",
-        "D_800A1830": "0x800A1830",
-        "func_80045494": "0x80045494",
-        "func_800455DC": "0x800455DC",
-        "_gp": "0x8009F214"
-      },
-      "compiler_flags": [
-        "-quiet",
-        "-msoft-float",
-        "-mgas",
-        "-G4",
-        "-fgnu-linker",
-        "-O2"
-      ],
-      "small_data_symbols": {
-        "D_8009F720": 4,
-        "D_8009F724": 4
-      }
-    },
-    {
       "name": "func_8004572C",
       "address": "0x8004572C",
       "size": "0x3C",

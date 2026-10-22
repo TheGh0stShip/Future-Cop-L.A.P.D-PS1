@@ -30,10 +30,10 @@ s32 func_80045678(s32 sound, s32 id, s32 arg2, s32 arg3)
     index = -1;
     slot = func_80045494(sound, D_800A1830, 0x47);
     if (slot == 0xFF) {
-        return index;
+        goto done;
     }
     if (D_8009F720 >= 0x1E) {
-        return index;
+        goto done;
     }
     channel = D_8009F724;
     channel->id = id;
@@ -45,5 +45,6 @@ s32 func_80045678(s32 sound, s32 id, s32 arg2, s32 arg3)
     D_8009F724 = channel->next;
     index = channel->index;
     func_800455DC(channel);
+done:
     return index;
 }
