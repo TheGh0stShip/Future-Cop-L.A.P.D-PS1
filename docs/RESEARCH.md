@@ -223,3 +223,9 @@ the USA executable before promotion. The pass also confirms that four-byte
 absolute globals in `-G4` units must remain array declarations to avoid
 small-data addressing, while the recurring 16.16 multiply sequence is likely
 from an inline assembly macro rather than compiler-generated `long long` C.
+
+Size-weighted near-match triage resolved another 628 bytes. The 252-byte damage
+handler required retaining an unsigned byte load while comparing a promoted
+signed local, the 208-byte angle interpolator used the branchless
+`((sign + value) ^ sign)` absolute-value idiom, and the 168-byte fixed-pool
+initializer used integer address addition to preserve operand order.

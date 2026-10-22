@@ -39,6 +39,7 @@ s32 func_800584BC(s32 message, struct Unk584BC *object, struct Unk584BCHit *hit)
 {
     s32 amount;
     s32 source;
+    s32 kind;
 
     if (message == 0xE) {
         source = 0;
@@ -58,8 +59,9 @@ s32 func_800584BC(s32 message, struct Unk584BC *object, struct Unk584BCHit *hit)
         source = hit->from.source;
     }
     if (amount > 0) {
-        if (hit->kind >= 2) {
-            object->flags19 |= (hit->kind << 3) & 0x7F0;
+        kind = hit->kind;
+        if (kind >= 2) {
+            object->flags19 |= (kind << 3) & 0x7F0;
         }
         func_80058378(object, amount, source);
     }

@@ -1,10 +1,9 @@
 #include "game/types.h"
 
-extern int abs(int value);
-
 s32 func_8005605C(s32 current, s32 target, s32 steps)
 {
     s32 difference;
+    s32 sign;
     s32 start;
     s32 i;
 
@@ -17,7 +16,8 @@ s32 func_8005605C(s32 current, s32 target, s32 steps)
         target -= 0x1000;
     }
     difference = target - current;
-    if (abs(difference) >= 0x800) {
+    sign = difference >> 31;
+    if (((sign + difference) ^ sign) >= 0x800) {
         if (difference > 0) {
             current += 0x1000;
         } else {

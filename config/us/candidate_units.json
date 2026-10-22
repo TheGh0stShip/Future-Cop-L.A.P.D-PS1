@@ -1134,15 +1134,6 @@
       "compiler": "gcc-2.7.2-psx"
     },
     {
-      "name": "func_8005605C",
-      "address": "0x8005605C",
-      "size": "0xD0",
-      "source": "src/game/8005605C.c",
-      "symbols": {},
-      "link": true,
-      "linker_symbols": {}
-    },
-    {
       "name": "func_80057358",
       "address": "0x80057358",
       "size": "0x4C",
@@ -1150,21 +1141,6 @@
       "symbols": {},
       "link": true,
       "linker_symbols": {}
-    },
-    {
-      "name": "func_800584BC",
-      "address": "0x800584BC",
-      "size": "0xFC",
-      "source": "src/game/800584BC.c",
-      "symbols": {
-        "func_800402DC": "0x800402DC",
-        "func_80058378": "0x80058378"
-      },
-      "link": true,
-      "linker_symbols": {
-        "func_800402DC": "0x800402DC",
-        "func_80058378": "0x80058378"
-      }
     },
     {
       "name": "func_800596C4",
