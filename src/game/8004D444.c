@@ -20,11 +20,13 @@ extern void func_8004D3D4(struct Entity *entity);
 struct Entity *func_8004D444(struct EntityDef *def)
 {
     struct Entity *entity;
+    s32 (*handler)(s32, struct Entity *, struct EntityDef *, s32);
 
     entity = func_80017EBC(def->handler(1, 0, 0, 0), 3);
-    entity->update = def->handler;
+    handler = def->handler;
+    entity->update = handler;
     entity->id = ++D_8009F7A0;
-    def->handler(2, entity, def, 0);
+    handler(2, entity, def, 0);
     func_8004D3D4(entity);
     return entity;
 }
