@@ -19,16 +19,38 @@ struct Unk3CDACHolder {
 s32 func_8003CDAC(struct Unk3CDACHolder *holder, s8 index)
 {
     struct Unk3CDACObject *object;
+    register struct Unk3CDACRange *range __asm__("$3");
+    register u32 flagWord __asm__("$2");
+    register s32 result __asm__("$2");
 
     object = holder->object;
+    result = 0;
     if (object == 0) {
-        return 0;
+        goto done;
     }
-    if ((object->flags >> 25) & 1) {
-        if (object->range == 0 || index < 0) {
-            return 0;
+    flagWord = object->flags;
+    flagWord >>= 25;
+    flagWord &= 1;
+    if (flagWord != 0) {
+        range = object->range;
+        if (range == 0) {
+            goto zero;
         }
-        return index < object->range->count;
+        if (index < 0) {
+            goto done;
+        }
+        if (index < range->count) {
+            result = 1;
+            goto done;
+        }
+zero:
+        result = 0;
+        goto done;
     }
-    return object->slots[index] != 0xFF;
+    if (object->slots[index] == 0xFF) {
+        goto done;
+    }
+    result = 1;
+done:
+    return result;
 }

@@ -501,6 +501,17 @@
       "link": true
     },
     {
+      "name": "func_8003CDAC",
+      "address": "0x8003CDAC",
+      "size": "0x84",
+      "source": "src/game/8003CDAC.c",
+      "symbols": {},
+      "compiler": "gcc-2.6.3-psx",
+      "link": true,
+      "linker_symbols": {},
+      "aspsx_signed_slot_test": true
+    },
+    {
       "name": "func_8003CF20",
       "address": "0x8003CF20",
       "size": "0x4C",

@@ -14,6 +14,7 @@ from tools.verify_matching_units import (
     normalize_aspsx_color_ramp_schedule,
     normalize_aspsx_packet_cursor,
     normalize_aspsx_shared_byte_store_return,
+    normalize_aspsx_signed_slot_test,
     reorder_aspsx_argument_save_groups,
     reorder_aspsx_vector_copy_call_setup,
     rotate_aspsx_saved_body_registers,
@@ -28,6 +29,20 @@ from tools.verify_matching_units import (
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_normalizes_signed_slot_test_registers(self):
+        source = (
+            "sll\t$4,$5,24\nsra\t$4,$4,24\n"
+            "bltz\t$4,$L_done\nnop # delay\n"
+            "lw\t$2,0($3)\nnop # delay\nsltu\t$2,$4,$2\n"
+            "beq\t$4,$3,$L_done\nnop # delay\n"
+            "li\t$2,0x00000001 # one\n"
+        )
+        result = normalize_aspsx_signed_slot_test(source)
+        self.assertIn("sll\t$2,$5,24\nsra\t$5,$2,24", result)
+        self.assertIn("bltz\t$5,$L_done\naddu\t$2,$0,$zero", result)
+        self.assertIn("sltu\t$2,$5,$2", result)
+        self.assertIn("beq\t$4,$3,$L_done\naddu\t$2,$0,$zero", result)
+
     def test_normalizes_color_ramp_setup_and_divisions(self):
         source = (
             "addiu\t$2,$2,%lo(D_colors) # low\n"

@@ -849,6 +849,47 @@ def normalize_aspsx_color_ramp_schedule(text):
     return text[:match.start()] + replacement + text[match.end():]
 
 
+def normalize_aspsx_signed_slot_test(text):
+    """Restore the retail registers and zero-result delay slots for a slot test."""
+    signed = re.compile(
+        r"sll\t\$4,\$5,24\n\s*"
+        r"sra\t\$4,\$4,24\n"
+        r"bltz\t\$4,(\$L[0-9A-Za-z_]+)\n"
+        r"nop[^\n]*\n"
+        r"lw\t\$2,0\(\$3\)\n"
+        r"nop[^\n]*\n"
+        r"sltu\t\$2,\$4,\$2\n"
+    )
+    match = signed.search(text)
+    if match is None:
+        raise ValueError("ASPSX signed-slot range pattern not found")
+    target = match.group(1)
+    replacement = (
+        "sll\t$2,$5,24\n"
+        "sra\t$5,$2,24\n"
+        f"bltz\t$5,{target}\n"
+        "addu\t$2,$0,$zero\n"
+        "lw\t$2,0($3)\n"
+        "nop\n"
+        "sltu\t$2,$5,$2\n"
+    )
+    text = text[:match.start()] + replacement + text[match.end():]
+    final = re.compile(
+        r"beq\t\$4,\$3,(\$L[0-9A-Za-z_]+)\n"
+        r"nop[^\n]*\n"
+        r"li\t\$2,0x00000001[^\n]*\n"
+    )
+    match = final.search(text)
+    if match is None:
+        raise ValueError("ASPSX signed-slot final test pattern not found")
+    replacement = (
+        f"beq\t$4,$3,{match.group(1)}\n"
+        "addu\t$2,$0,$zero\n"
+        "li\t$2,0x00000001\n"
+    )
+    return text[:match.start()] + replacement + text[match.end():]
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -958,6 +999,10 @@ def validate(config):
         if not isinstance(unit.get("aspsx_color_ramp_schedule", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_color_ramp_schedule must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_signed_slot_test", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_signed_slot_test must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -1089,6 +1134,10 @@ def compile_unit(unit, config, prefix, work, environment=None):
     if unit.get("aspsx_color_ramp_schedule", False):
         processed.write_text(
             normalize_aspsx_color_ramp_schedule(processed.read_text())
+        )
+    if unit.get("aspsx_signed_slot_test", False):
+        processed.write_text(
+            normalize_aspsx_signed_slot_test(processed.read_text())
         )
     if marker_lines:
         marker_names = set(small_data_symbols)
