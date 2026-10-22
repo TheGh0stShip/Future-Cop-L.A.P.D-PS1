@@ -25,15 +25,17 @@ extern void func_800614BC(struct Unk6158CEntry *entry);
 void func_8006158C(s32 id)
 {
     struct Unk60E28Table *table;
-    struct Unk6158CEntry **cursor;
+    register struct Unk6158CEntry **cursor __asm__("$7");
     struct Unk6158CEntry *entry;
     s32 remaining;
+    register s32 target __asm__("$8");
 
+    target = id;
     table = D_8009F800;
     cursor = table->entries;
     for (remaining = table->count; remaining > 0; remaining--) {
         entry = *cursor++;
-        if (entry->info->def->id == id) {
+        if (entry->info->def->id == target) {
             func_800614BC(entry);
             return;
         }
