@@ -42,10 +42,12 @@ extern s32 func_80046AD8(void);
 void func_800453B8(void)
 {
     u32 i;
+    struct Unk453B8Bank *bank;
+    struct Unk453B8Stream *stream;
     struct SoundVoice *voice;
 
+    D_8009F73C = D_800AACC8;
     voice = D_800AACC8;
-    D_8009F73C = voice;
     D_8009F740 = 0x18;
     D_8009F744 = 0;
     D_8009F748 = 0;
@@ -62,13 +64,18 @@ void func_800453B8(void)
     voice[-1].next = 0;
     func_80044EF8();
     func_8004582C();
-    for (i = 0; i < 6; i++) {
-        D_800A10E0[i].unk00 = 0;
+    bank = D_800A10E0;
+    for (i = 0; i < 6; i++, bank++) {
+        bank->unk00 = 0;
     }
     D_8009F32C = 0;
-    for (i = 0; i < 2; i++) {
-        D_800A1810[i].unk08 = func_80046AD8();
-        D_800A1810[i].unk00 = 0;
+    i = 0;
+    stream = D_800A1810;
+    while (i < 2) {
+        stream->unk08 = func_80046AD8();
+        stream->unk00 = 0;
+        i++;
+        stream++;
     }
     D_8009F738 = 0;
 }
