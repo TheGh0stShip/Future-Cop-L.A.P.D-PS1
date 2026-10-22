@@ -25,22 +25,25 @@ void func_8004D598(void)
     while (next != 0) {
         entity = next;
         next = next->next;
-        if (entity->id != 0) {
-            previous = entity;
-            continue;
-        }
-        if (entity->flags & 0x10000000) {
-            func_80061020(entity);
-        }
-        entity->update(5, entity, 0, 0);
-        if (previous != 0) {
-            previous->next = entity->next;
-        } else {
-            D_8009FA40 = entity->next;
-        }
-        if (entity->next == 0) {
+        if (entity->id == 0) {
+            if (entity->flags & 0x10000000) {
+                func_80061020(entity);
+            }
+            entity->update(5, entity, 0, 0);
+            if (previous != 0) {
+                if ((previous->next = entity->next) != 0) {
+                    goto release;
+                }
+            } else {
+                if ((D_8009FA40 = entity->next) != 0) {
+                    goto release;
+                }
+            }
             D_8009FA88 = previous;
+release:
+            func_800181D4(entity);
+        } else {
+            previous = entity;
         }
-        func_800181D4(entity);
     }
 }
