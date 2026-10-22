@@ -21,25 +21,35 @@ extern u8 func_8004DA84(struct Entity *entity, u8 kind, u8 value, s32 retry);
 
 void func_8004DB74(s32 elapsed)
 {
-    struct EntityMessage *message;
-    u32 pending;
     s32 i;
+    u32 pending;
+    struct EntityMessage *message;
+    u32 bit;
 
+    if (D_8009F7A8 == 0) {
+        return;
+    }
     pending = D_8009F7A8;
     message = D_800A2090;
-    for (i = 0; pending != 0; i++, message++, pending >>= 1) {
+    i = 0;
+    bit = 1;
+    do {
         if (!(pending & 1)) {
-            continue;
+            goto next;
         }
         message->timer -= elapsed;
         if (message->timer > 0) {
-            continue;
+            goto next;
         }
         message->timer += 600;
         if (message->target->id == message->id &&
             func_8004DA84(message->target, message->kind, message->value, 0) == 0) {
-            continue;
+            goto next;
         }
-        D_8009F7A8 ^= 1 << i;
-    }
+        D_8009F7A8 ^= bit << i;
+next:
+        i++;
+        message++;
+        pending >>= 1;
+    } while (pending != 0);
 }

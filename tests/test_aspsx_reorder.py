@@ -9,6 +9,7 @@ from tools.verify_matching_units import (
     move_aspsx_load_delay_label,
     reorder_aspsx_argument_save_groups,
     reorder_aspsx_vector_copy_call_setup,
+    rotate_aspsx_saved_body_registers,
     reuse_aspsx_initialized_zero,
     restore_aspsx_byte_test_temporary,
     reuse_aspsx_call_constant,
@@ -20,6 +21,33 @@ from tools.verify_matching_units import (
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_rotates_saved_registers_only_inside_function_body(self):
+        source = (
+            "sw\t$19,28($sp)\n"
+            "sw\t$18,24($sp)\n"
+            "sw\t$17,20($sp)\n"
+            "sw\t$16,16($sp)\n"
+            "addu\t$17,$2,$zero\n"
+            "addu\t$18,$17,$19\n"
+            "lw\t$31,40($sp)\n"
+            "lw\t$19,28($sp)\n"
+            "lw\t$18,24($sp)\n"
+            "lw\t$17,20($sp)\n"
+        )
+        expected = (
+            "sw\t$19,28($sp)\n"
+            "sw\t$18,24($sp)\n"
+            "sw\t$17,20($sp)\n"
+            "sw\t$16,16($sp)\n"
+            "addu\t$18,$2,$zero\n"
+            "addu\t$19,$18,$17\n"
+            "lw\t$31,40($sp)\n"
+            "lw\t$19,28($sp)\n"
+            "lw\t$18,24($sp)\n"
+            "lw\t$17,20($sp)\n"
+        )
+        self.assertEqual(rotate_aspsx_saved_body_registers(source), expected)
+
     def test_hoists_symbolic_base_before_array_index(self):
         source = "sll\t$3,$3,3\nla\t$2,D_table\naddu\t$3,$3,$2\n"
         expected = "la\t$2,D_table\nsll\t$3,$3,3\naddu\t$3,$3,$2\n"

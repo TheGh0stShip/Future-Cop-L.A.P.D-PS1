@@ -477,6 +477,34 @@ def hoist_aspsx_indexed_address(text):
     raise ValueError("ASPSX indexed-address pattern not found")
 
 
+def rotate_aspsx_saved_body_registers(text):
+    """Rotate s1/s2/s3 allocation inside a saved-register function body."""
+    lines = text.splitlines()
+    start = next(
+        (index + 1 for index, line in enumerate(lines)
+         if re.fullmatch(r"\s*sw\s+\$16,16\(\$sp\)\s*", line)),
+        None,
+    )
+    end = next(
+        (index for index, line in enumerate(lines)
+         if start is not None and index >= start
+         and re.fullmatch(r"\s*lw\s+\$31,40\(\$sp\)\s*", line)),
+        None,
+    )
+    if start is None or end is None or start >= end:
+        raise ValueError("ASPSX saved-body register pattern not found")
+    body = "\n".join(lines[start:end])
+    if not all(re.search(rf"\${register}\b", body) for register in (17, 18, 19)):
+        raise ValueError("ASPSX saved-body register set not found")
+    body = re.sub(r"\$(17|18|19)\b", lambda match: {
+        "17": "$18",
+        "18": "$19",
+        "19": "$17",
+    }[match.group(1)], body)
+    lines[start:end] = body.splitlines()
+    return "\n".join(lines) + "\n"
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -554,6 +582,10 @@ def validate(config):
         if not isinstance(unit.get("aspsx_hoist_indexed_address", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_hoist_indexed_address must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_rotate_saved_body", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_rotate_saved_body must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -662,6 +694,10 @@ def compile_unit(unit, config, prefix, work, environment=None):
         )
     if unit.get("aspsx_hoist_indexed_address", False):
         processed.write_text(hoist_aspsx_indexed_address(processed.read_text()))
+    if unit.get("aspsx_rotate_saved_body", False):
+        processed.write_text(
+            rotate_aspsx_saved_body_registers(processed.read_text())
+        )
     if marker_lines:
         marker_names = set(small_data_symbols)
         processed.write_text("\n".join(
