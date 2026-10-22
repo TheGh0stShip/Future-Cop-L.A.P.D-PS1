@@ -16,9 +16,11 @@ struct ObjectReference {
 void func_800336A8(struct ObjectReference *state,
                    struct ReferencedObject *object)
 {
-    if (object != 0 && state->object != object) {
-        state->object = object;
-        state->value = object->value;
+    if (object != 0) {
+        if (state->object != object) {
+            state->object = object;
+            state->value = object->value;
+        }
         state->dirty = 0;
     }
 }

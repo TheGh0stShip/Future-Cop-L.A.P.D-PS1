@@ -320,6 +320,14 @@
       }
     },
     {
+      "name": "func_800336A8",
+      "address": "0x800336A8",
+      "size": "0x34",
+      "source": "src/game/800336A8.c",
+      "symbols": {},
+      "compiler": "gcc-2.7.2-psx"
+    },
+    {
       "name": "func_8003A8C0",
       "address": "0x8003A8C0",
       "size": "0x4C",
