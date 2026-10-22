@@ -7,6 +7,7 @@ from tools.verify_matching_units import (
     fill_aspsx_symbolic_load_delay_slot,
     hoist_aspsx_small_data_load_before_prologue,
     move_aspsx_load_delay_label,
+    normalize_aspsx_indexed_byte_access,
     reorder_aspsx_argument_save_groups,
     reorder_aspsx_vector_copy_call_setup,
     rotate_aspsx_saved_body_registers,
@@ -21,6 +22,47 @@ from tools.verify_matching_units import (
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_normalizes_indexed_byte_access_and_shared_return(self):
+        source = (
+            "beq\t$2,$0,$L10\n"
+            "$L10:\n"
+            "j\t$31\n"
+            "nop  # DEBUG: branch/jump\n"
+            "addu\t$2,$3,$2\n"
+            "lbu\t$3,4($2)\n"
+            "#nop # load delay\n"
+            "addu\t$2,$2,4\n"
+            "j\t$L8\n"
+            "andi\t$3,$3,0x00fd\n"
+            "addu\t$2,$3,$2\n"
+            "lbu\t$3,4($2)\n"
+            "#nop # load delay\n"
+            "addu\t$2,$2,4\n"
+            "ori\t$3,$3,0x0002\n"
+            "$L9:\n"
+            "j\t$31\n"
+            "nop  # DEBUG: branch/jump\n"
+        )
+        expected = (
+            "beq\t$2,$0,$L9\n"
+            "j\t$L9\n"
+            "nop  # DEBUG: branch/jump\n"
+            "addu\t$2,$2,4\n"
+            "addu\t$2,$3,$2\n"
+            "lbu\t$3,0($2)\n"
+            "j\t$L8\n"
+            "andi\t$3,$3,0x00fd\n"
+            "addu\t$2,$2,4\n"
+            "addu\t$2,$3,$2\n"
+            "lbu\t$3,0($2)\n"
+            "nop\n"
+            "ori\t$3,$3,0x0002\n"
+            "$L9:\n"
+            "j\t$31\n"
+            "nop  # DEBUG: branch/jump\n"
+        )
+        self.assertEqual(normalize_aspsx_indexed_byte_access(source), expected)
+
     def test_rotates_saved_registers_only_inside_function_body(self):
         source = (
             "sw\t$19,28($sp)\n"

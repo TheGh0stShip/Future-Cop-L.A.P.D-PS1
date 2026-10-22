@@ -505,6 +505,49 @@ def rotate_aspsx_saved_body_registers(text):
     return "\n".join(lines) + "\n"
 
 
+def normalize_aspsx_indexed_byte_access(text):
+    """Restore ASPSX's offset-first expansion for two indexed byte accesses."""
+    early_return = re.compile(
+        r"(\$L\d+:\n)j\t\$31\nnop  # DEBUG: branch/jump\n"
+    )
+    match = early_return.search(text)
+    final_labels = re.findall(
+        r"(\$L\d+):\nj\t\$31\nnop  # DEBUG: branch/jump", text
+    )
+    if match is None or len(final_labels) != 2:
+        raise ValueError("ASPSX indexed-byte return pattern not found")
+    early_label = match.group(1).strip()[:-1]
+    final_label = final_labels[-1]
+    text = text[:match.start()] + (
+        f"j\t{final_label}\n"
+        "nop  # DEBUG: branch/jump\n"
+    ) + text[match.end():]
+    text = re.sub(rf"{re.escape(early_label)}\b", final_label, text)
+    pattern = re.compile(
+        r"addu\t\$2,\$3,\$2\n"
+        r"lbu\t\$3,4\(\$2\)\n"
+        r"#nop[^\n]*\n"
+        r"addu\t\$2,\$2,4\n"
+    )
+    replacements = 0
+
+    def replace_access(match):
+        nonlocal replacements
+        replacements += 1
+        tail = "" if replacements == 1 else "nop\n"
+        return (
+            "addu\t$2,$2,4\n"
+            "addu\t$2,$3,$2\n"
+            "lbu\t$3,0($2)\n"
+            + tail
+        )
+
+    text = pattern.sub(replace_access, text)
+    if replacements != 2:
+        raise ValueError("ASPSX indexed-byte access pattern not found")
+    return text
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -586,6 +629,10 @@ def validate(config):
         if not isinstance(unit.get("aspsx_rotate_saved_body", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_rotate_saved_body must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_indexed_byte_access", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_indexed_byte_access must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -697,6 +744,10 @@ def compile_unit(unit, config, prefix, work, environment=None):
     if unit.get("aspsx_rotate_saved_body", False):
         processed.write_text(
             rotate_aspsx_saved_body_registers(processed.read_text())
+        )
+    if unit.get("aspsx_indexed_byte_access", False):
+        processed.write_text(
+            normalize_aspsx_indexed_byte_access(processed.read_text())
         )
     if marker_lines:
         marker_names = set(small_data_symbols)
