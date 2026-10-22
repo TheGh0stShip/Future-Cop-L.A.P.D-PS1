@@ -16,6 +16,31 @@
   ],
   "units": [
     {
+      "name": "func_800847E0",
+      "address": "0x800847E0",
+      "size": "0x894",
+      "source": "src/game/800847E0.c",
+      "compiler_flags": [
+        "-quiet",
+        "-msoft-float",
+        "-mgas",
+        "-G4",
+        "-fgnu-linker",
+        "-O2"
+      ],
+      "symbols": {
+        "_gp": "0x8009F214",
+        "D_8009F9D8": "0x8009F9D8",
+        "D_8009FABC": "0x8009FABC"
+      },
+      "link": true,
+      "linker_symbols": {
+        "_gp": "0x8009F214",
+        "D_8009F9D8": "0x8009F9D8",
+        "D_8009FABC": "0x8009FABC"
+      }
+    },
+    {
       "name": "func_80018DC0",
       "address": "0x80018DC0",
       "size": "0x4EC",
