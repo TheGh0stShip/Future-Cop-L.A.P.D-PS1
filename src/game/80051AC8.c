@@ -9,7 +9,7 @@ struct DisplayRecord {
 
 struct DisplayOwner {
     u8 pad_00[0x2DC];
-    struct DisplayRecord record;
+    struct DisplayRecord *record;
 };
 
 struct DisplayState {
@@ -19,7 +19,8 @@ struct DisplayState {
 
 void func_80051AC8(struct DisplayState *state, int compact)
 {
-    struct DisplayRecord *record = &state->owner->record;
+    struct DisplayRecord *record = (struct DisplayRecord *)
+        ((u8 *)state->owner->record + 8);
     s32 center = 0x126;
 
     if (compact != 0) {
