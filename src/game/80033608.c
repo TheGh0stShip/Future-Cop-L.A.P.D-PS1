@@ -42,32 +42,40 @@ struct Unk33608Owner {
 
 void func_80033608(struct Unk33608Owner *owner, struct Unk33608Anim *anim)
 {
-    s32 value;
-    u16 half;
+    register struct Unk33608Mirror *firstMirror __asm__("$2");
+    register struct Unk33608Mirror *secondMirror __asm__("$3");
+    register s32 value __asm__("$2");
+    register u16 half __asm__("$3");
+    register u16 lastHalf __asm__("$2");
 
     if (anim != 0) {
         if (owner->animB8 != anim) {
-            owner->mirror->anim90 = anim;
-            owner->mirror->anim68 = anim;
+            firstMirror = owner->mirror;
+            firstMirror->anim90 = anim;
+            firstMirror->anim68 = anim;
+            secondMirror = owner->mirror;
             owner->animB8 = anim;
             value = anim->value08;
-            owner->mirror->value94 = value;
-            owner->mirror->value6C = value;
+            secondMirror->value94 = value;
+            secondMirror->value6C = value;
             owner->valueBC = value;
         }
     } else {
+        firstMirror = owner->mirror;
         half = owner->valueB4;
-        owner->mirror->value8E = half;
-        owner->mirror->value66 = half;
+        firstMirror->value8E = half;
+        firstMirror->value66 = half;
         owner->valueB6 = half;
         if (owner->modeA6 != 4) {
-            owner->mirror->mode7E = 4;
-            owner->mirror->mode56 = 4;
+            firstMirror = owner->mirror;
+            firstMirror->mode7E = 4;
+            firstMirror->mode56 = 4;
             owner->modeA6 = 4;
-            half = owner->mirror->base1B;
-            owner->mirror->value80 = half;
-            owner->mirror->value58 = half;
-            owner->valueA8 = half;
+            secondMirror = owner->mirror;
+            lastHalf = secondMirror->base1B;
+            secondMirror->value80 = lastHalf;
+            secondMirror->value58 = lastHalf;
+            owner->valueA8 = lastHalf;
         }
     }
 }

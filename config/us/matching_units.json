@@ -320,6 +320,16 @@
       }
     },
     {
+      "name": "func_80033608",
+      "address": "0x80033608",
+      "size": "0xA0",
+      "source": "src/game/80033608.c",
+      "symbols": {},
+      "compiler": "gcc-2.7.2-cdk",
+      "link": true,
+      "linker_symbols": {}
+    },
+    {
       "name": "func_800336A8",
       "address": "0x800336A8",
       "size": "0x34",
