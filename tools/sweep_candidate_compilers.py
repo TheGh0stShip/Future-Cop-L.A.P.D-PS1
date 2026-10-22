@@ -17,7 +17,11 @@ except ModuleNotFoundError:  # Imported as tools.sweep_candidate_compilers.
 ROOT = Path(__file__).resolve().parents[1]
 HEADER_SIZE = 0x800
 LOAD_ADDRESS = 0x80010000
-DEFAULT_COMPILERS = ("gcc-2.8.1-psx", "gcc-2.7.2-psx")
+DEFAULT_COMPILERS = (
+    "gcc-2.8.1-psx",
+    "gcc-2.8.0-psx",
+    "gcc-2.7.2-psx",
+)
 
 
 def compare(expected: bytes, actual: bytes) -> dict:

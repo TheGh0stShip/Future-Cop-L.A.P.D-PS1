@@ -24,6 +24,8 @@ Sources:
 - <https://github.com/alexbeavs-ps1-ports/future-cop-lapd-recomp>
 - <https://github.com/Ghoster738/Future-Cop-MIT>
 - <https://forum.mattkc.com/viewtopic.php?p=2504>
+- <https://github.com/decompals/old-gcc>
+- <https://github.com/Fuuzetsu/tenchu-decomp/blob/master/docs/toolchain.md>
 
 ## USA retail evidence
 
@@ -47,14 +49,22 @@ Sources:
 
 GCC 2.7.2 PSX with `-O2` is the leading game-code hypothesis, based on the
 matching pipeline proven in the read-only BattleTanx: Global Assault PS1 project
-and exact Future Cop units. The callback wrappers at
-the callback wrappers at `0x80091480`, `0x800914B0`, `0x800914E0`,
+and exact Future Cop units. The callback wrappers at `0x80091480`,
+`0x800914B0`, `0x800914E0`,
 `0x80091510` and `0x80091574`, plus the two-call loop at `0x8001EB6C`, match
 only after selecting the pinned 2.7.2 compiler profile. The C behavior was
 unchanged; the decisive differences were scheduling and epilogue placement.
 Compiler selection therefore remains per-unit evidence rather than a global
 assumption. Switch lowering, division, GTE scheduling, and small-data behavior
 still require representative matches.
+
+The compiler bank also includes reproducible GCC 2.8.0 PSX from the pinned
+`decompals/old-gcc` release. PsyQ 4.3's original `CC1PSX.EXE` identifies itself
+as `2.8.0 SN32 Build 4.0.0007`, and contemporary EA decompilation research
+independently identifies that release as an EA compiler. A full sweep across
+the current 129 candidates found no exact unit and no output improvement over
+2.8.1, so 2.8.0 remains available for later original-object attribution but is
+not selected by any current matching unit.
 
 An audited reconstruction sweep of the `0x80040000..0x8005FFFF` and
 `0x80070000..0x8008FFFF` regions produced 116 additional matching C functions

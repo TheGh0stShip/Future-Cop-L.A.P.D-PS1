@@ -17,10 +17,11 @@ binutils_url=https://archive.ubuntu.com/ubuntu/pool/universe/b/binutils-mipsen/$
 binutils_archive="$downloads/$binutils_name"
 binutils_sha=678275fa6abda0b7fabbc55ff6a09654701a6c2e86794c7a0b6e773e663e49db
 
-# Most units use 2.8.1; units whose retail code shows the older text epilogue
-# (lw ra; addiu sp; jr ra; nop) select 2.7.2 through their manifest entry.
+# Compiler selection is per original object. EA-era code is known to span the
+# 2.7.2, 2.8.0, and 2.8.1 PSX compiler releases.
 for spec in \
     gcc-2.8.1-psx:51e94d84906d5ac1fa58cf66b7eed43e2c995526ef71df6ff5562df0177117e3 \
+    gcc-2.8.0-psx:6e3aa53f117d9957feca444e9bbc9b5435b70624fd629a4dd306efdbe5d25f54 \
     gcc-2.7.2-psx:aca64479041aa2d645dc52ebcaace276c0aa06f258c0e3f190ccf6d76701ffbc
 do
     name=${spec%%:*}
@@ -50,6 +51,7 @@ if ! command -v mipsel-linux-gnu-as >/dev/null 2>&1; then
 fi
 
 test -x "$dest/gcc-2.8.1-psx/cc1"
+test -x "$dest/gcc-2.8.0-psx/cc1"
 test -x "$dest/gcc-2.7.2-psx/cc1"
 test -f "$dest/maspsx-$maspsx_commit/maspsx.py"
 test -x "$dest/mipsel-binutils/root/usr/bin/mipsel-linux-gnu-as" || \
