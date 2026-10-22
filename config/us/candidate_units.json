@@ -25,15 +25,6 @@
       }
     },
     {
-      "name": "func_800243C4",
-      "address": "0x800243C4",
-      "size": "0x34",
-      "source": "src/game/800243C4.c",
-      "symbols": {
-        "func_800222CC": "0x800222CC"
-      }
-    },
-    {
       "name": "func_8002A5B4",
       "address": "0x8002A5B4",
       "size": "0x40",

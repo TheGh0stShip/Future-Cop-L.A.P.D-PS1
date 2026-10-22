@@ -11,8 +11,8 @@ void func_800243C4(struct TaggedObject *object, s32 third, s32 second)
 {
     s32 values[3];
 
-    values[0] = -1;
     values[1] = second;
     values[2] = third;
+    values[0] = -1;
     func_800222CC(object->tag, values);
 }

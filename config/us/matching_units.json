@@ -8093,6 +8093,17 @@
       "link": true,
       "linker_symbols": {"D_8009FA0C": "0x8009FA0C"},
       "symbols": {"D_8009FA0C": "0x8009FA0C"}
+    },
+    {
+      "name": "func_800243C4",
+      "address": "0x800243C4",
+      "size": "0x34",
+      "source": "src/game/800243C4.c",
+      "compiler": "gcc-2.7.2-cdk",
+      "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G0", "-fgnu-linker", "-O2"],
+      "link": true,
+      "linker_symbols": {"func_800222CC": "0x800222CC"},
+      "symbols": {"func_800222CC": "0x800222CC"}
     }
   ]
 }
