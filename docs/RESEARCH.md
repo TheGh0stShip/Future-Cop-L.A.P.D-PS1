@@ -160,6 +160,11 @@ recovers the missing instruction and makes `SpuSetTransferStartAddr` at
 `0x80098EE8` an exact 92-byte function match. Its following four-byte zero is
 object alignment and is not counted as code. The callback setter remains
 unresolved.
+
+Three additional LIBSPU wrappers match under the same Cygnus `-O3` profile:
+the DMA callback bridge at `0x800979F8`, the cold-start initializer at
+`0x80097A28`, and `SpuSetReverbVoice` at `0x80098788`. Their 104 verified bytes
+exclude trailing object-alignment zeros.
 The intervening 212-byte initializer at `0x8008B094` is `_padLoadActInfo`; it
 lays out the mode, capability, and combination tables within a caller-provided
 buffer and installs the two command-processing callbacks.
