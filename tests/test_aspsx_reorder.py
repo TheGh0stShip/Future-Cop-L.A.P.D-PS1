@@ -2,12 +2,33 @@ import unittest
 
 from tools.verify_matching_units import (
     move_aspsx_load_delay_label,
+    reorder_aspsx_argument_save_groups,
     reorder_aspsx_return_delay_slot,
     reorder_aspsx_jump_store_delay_slot,
 )
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_orders_adjacent_argument_save_groups(self):
+        source = (
+            "sw\t$20,32($sp)\n"
+            "addu\t$20,$7,$zero\n"
+            "sw\t$21,36($sp)\n"
+            "addu\t$21,$6,$zero\n"
+        )
+        expected = (
+            "sw\t$21,36($sp)\n"
+            "addu\t$21,$6,$zero\n"
+            "sw\t$20,32($sp)\n"
+            "addu\t$20,$7,$zero\n"
+        )
+        self.assertEqual(reorder_aspsx_argument_save_groups(source), expected)
+
+    def test_rejects_ordered_argument_save_groups(self):
+        source = "sw\t$20,32($sp)\naddu\t$20,$6,$zero\n"
+        with self.assertRaisesRegex(ValueError, "pattern not found"):
+            reorder_aspsx_argument_save_groups(source)
+
     def test_moves_terminal_stack_pop_into_return_delay_slot(self):
         source = (
             "lw\t$16,16($sp)\n"

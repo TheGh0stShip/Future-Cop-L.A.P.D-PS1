@@ -100,6 +100,33 @@ def move_aspsx_load_delay_label(text):
     raise ValueError("ASPSX load-delay-label pattern not found")
 
 
+def reorder_aspsx_argument_save_groups(text):
+    """Order adjacent saved-register argument moves by argument register."""
+    lines = text.splitlines()
+    store = re.compile(r"\s*sw\s+\$(\d+),(-?\d+)\(\$sp\)\s*")
+    move = re.compile(r"\s*addu\s+\$(\d+),\$(\d+),\$zero\s*")
+    for index in range(len(lines) - 3):
+        first_store = store.fullmatch(lines[index])
+        first_move = move.fullmatch(lines[index + 1])
+        second_store = store.fullmatch(lines[index + 2])
+        second_move = move.fullmatch(lines[index + 3])
+        if not all((first_store, first_move, second_store, second_move)):
+            continue
+        if first_store.group(1) != first_move.group(1):
+            continue
+        if second_store.group(1) != second_move.group(1):
+            continue
+        first_argument = int(first_move.group(2))
+        second_argument = int(second_move.group(2))
+        if not (4 <= second_argument < first_argument <= 7):
+            continue
+        lines[index:index + 4] = [
+            lines[index + 2], lines[index + 3], lines[index], lines[index + 1]
+        ]
+        return "\n".join(lines) + "\n"
+    raise ValueError("ASPSX argument-save-group pattern not found")
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -129,6 +156,10 @@ def validate(config):
         if not isinstance(unit.get("aspsx_reorder_jump_store", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_reorder_jump_store must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_reorder_argument_saves", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_reorder_argument_saves must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -192,6 +223,10 @@ def compile_unit(unit, config, prefix, work, environment=None):
     if unit.get("aspsx_reorder_jump_store", False):
         processed.write_text(
             reorder_aspsx_jump_store_delay_slot(processed.read_text())
+        )
+    if unit.get("aspsx_reorder_argument_saves", False):
+        processed.write_text(
+            reorder_aspsx_argument_save_groups(processed.read_text())
         )
     if marker_lines:
         marker_names = set(small_data_symbols)
