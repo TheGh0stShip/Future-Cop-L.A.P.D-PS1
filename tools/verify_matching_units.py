@@ -370,6 +370,140 @@ def normalize_aspsx_ratan_layout(text):
     return text
 
 
+def normalize_aspsx_analog_direction_layout(text):
+    """Reproduce the retail scheduling for the analog direction helper."""
+    prologue = re.compile(
+        r"bne\t\$2,\$0,(\$L\d+)\n"
+        r"addu\t\$18,\$7,\$zero\n\s*"
+        r"lb\t\$2,192\(\$8\)\n"
+        r"nop # DEBUG: Reuse of '\$2'\. 'bne\t\$2,\$0,(\$L\d+)' does not use \$at\n"
+        r"bne\t\$2,\$0,\2\n"
+        r"addu\t\$2,\$0,\$zero\n\s*"
+        r"lb\t\$2,784\(\$8\)\n"
+        r"nop # DEBUG: Reuse of '\$2'\. 'bne\t\$2,\$0,\2' does not use \$at\n"
+        r"bne\t\$2,\$0,\2\n"
+        r"addu\t\$2,\$0,\$zero\n\s*"
+        r"addu\t\$4,\$sp,16\n"
+        r"addu\t\$5,\$sp,20\n"
+    )
+    prologue_replacement = (
+        "bne\t$2,$0,$Lanalog_exit\n"
+        "addu\t$18,$7,$zero\n\n"
+        "lb\t$2,192($8)\n"
+        "nop # DEBUG: analog direction branch\n"
+        "bne\t$2,$0,\\2\n"
+        "addu\t$2,$0,$zero\n\n"
+        "lb\t$2,784($8)\n"
+        "nop # DEBUG: analog direction branch\n"
+        "beq\t$2,$0,$Lanalog_body\n"
+        "addu\t$4,$sp,16\n"
+        "$Lanalog_exit:\n"
+        "j\t\\2\n"
+        "addu\t$2,$0,$zero\n"
+        "$Lanalog_body:\n"
+        "addu\t$5,$sp,20\n"
+    )
+    text, prologue_fires = prologue.subn(prologue_replacement, text, count=1)
+
+    status_branch = re.compile(
+        r"beq\t\$2,\$0,(\$L\d+)\n"
+        r"addu\t\$5,\$0,\$zero\n"
+    )
+    status_match = status_branch.search(text)
+    epilogue_match = re.search(r"(\$L\d+):\nlw\t\$31,36\(\$sp\)", text)
+    if status_match is None or epilogue_match is None:
+        raise ValueError("ASPSX analog direction status or epilogue label not found")
+    zero_label = status_match.group(1)
+    epilogue_label = epilogue_match.group(1)
+    text = status_branch.sub(
+        f"beq\t$2,$0,{epilogue_label}\naddu\t$5,$0,$zero\n", text, count=1
+    )
+    text, zero_fires = re.subn(
+        rf"{re.escape(zero_label)}:\naddu\t\$2,\$0,\$zero\n",
+        "", text, count=1,
+    )
+
+    coordinate_setup = re.compile(
+        r"addu\t\$4,\$3,-128\n"
+        r"addu\t\$2,\$2,-128\n"
+        r"sw\t\$2,20\(\$sp\)\n"
+        r"addu\t\$2,\$4,\$zero\n"
+        r"addu\t\$3,\$3,-89\n"
+        r"sltu\t\$3,\$3,79\n"
+        r"beq\t\$3,\$0,(\$L\d+)\n"
+        r"sw\t\$4,16\(\$sp\)\n"
+    )
+    coordinate_replacement = (
+        "addu\t$4,$3,-128\n"
+        "addu\t$2,$2,-128\n"
+        "addu\t$3,$3,-89\n"
+        "sltu\t$3,$3,79\n"
+        "sw\t$4,16($sp)\n"
+        "beq\t$3,$0,\\1\n"
+        "sw\t$2,20($sp)\n"
+    )
+    text, coordinate_fires = coordinate_setup.subn(
+        coordinate_replacement, text, count=1
+    )
+    text, clamp_fires = re.subn(
+        r"slt\t\$2,\$2,225\n",
+        "slt\t$2,$4,225\n",
+        text,
+        count=1,
+    )
+
+    result_tail = re.compile(
+        r"lw\t\$2,20\(\$sp\)\n"
+        r"nop # DEBUG: Reuse of '\$2'\. 'sra\t\$4,\$2,31' does not use \$at\n"
+        r"sra\t\$4,\$2,31\n"
+        r"addu\t\$2,\$2,\$4\n"
+        r"xor\t\$2,\$2,\$4\n"
+        r"sw\t\$2,0\(\$17\)\n"
+        r"lw\t\$3,16\(\$sp\)\n"
+        r"#nop # DEBUG: 'andi\t\$2,\$6,0x00ff' does not load from \$3\n"
+        r"andi\t\$2,\$6,0x00ff\n"
+        r"sra\t\$4,\$3,31\n"
+        r"addu\t\$3,\$3,\$4\n"
+        r"xor\t\$3,\$3,\$4\n"
+        r"j\t" + re.escape(epilogue_label) + r"\n"
+        r"sw\t\$3,0\(\$18\)\n"
+    )
+    result_replacement = (
+        "lw\t$2,20($sp)\n"
+        "nop # DEBUG: analog direction absolute value\n"
+        "sra\t$3,$2,31\n"
+        "addu\t$2,$3,$2\n"
+        "xor\t$2,$2,$3\n"
+        "sw\t$2,0($17)\n"
+        "lw\t$2,16($sp)\n"
+        "nop # DEBUG: analog direction absolute value\n"
+        "sra\t$3,$2,31\n"
+        "addu\t$2,$3,$2\n"
+        "xor\t$2,$2,$3\n"
+        "sw\t$2,0($18)\n"
+        "andi\t$2,$6,0x00ff\n"
+    )
+    text, tail_fires = result_tail.subn(result_replacement, text, count=1)
+    text, epilogue_fires = re.subn(
+        r"j\t\$31\naddu\t\$sp,\$sp,40\n",
+        "addu\t$sp,$sp,40\nj\t$31\nnop\n",
+        text,
+        count=1,
+    )
+    if (
+        prologue_fires, zero_fires, coordinate_fires, clamp_fires,
+        tail_fires, epilogue_fires,
+    ) != (
+        1, 1, 1, 1, 1, 1
+    ):
+        raise ValueError(
+            "ASPSX analog direction layout expected six unique patterns; found "
+            f"{prologue_fires}, {zero_fires}, {coordinate_fires}, {clamp_fires}, "
+            f"{tail_fires}, {epilogue_fires}"
+        )
+    return text
+
+
 def restore_aspsx_byte_test_temporary(text):
     """Restore a temporary register used for byte tests of saved values."""
     patterns = {
@@ -1048,6 +1182,10 @@ def validate(config):
             raise ValueError(
                 f"{unit['name']}: aspsx_ratan_layout must be boolean"
             )
+        if not isinstance(unit.get("aspsx_analog_direction_layout", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_analog_direction_layout must be boolean"
+            )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
             if not isinstance(linker_symbols, dict):
@@ -1185,6 +1323,10 @@ def compile_unit(unit, config, prefix, work, environment=None):
         )
     if unit.get("aspsx_ratan_layout", False):
         processed.write_text(normalize_aspsx_ratan_layout(processed.read_text()))
+    if unit.get("aspsx_analog_direction_layout", False):
+        processed.write_text(
+            normalize_aspsx_analog_direction_layout(processed.read_text())
+        )
     if marker_lines:
         marker_names = set(small_data_symbols)
         processed.write_text("\n".join(

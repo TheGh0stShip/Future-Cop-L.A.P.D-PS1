@@ -13,12 +13,12 @@ s32 func_800538C8(u8 *context, u32 *flags, s32 *verticalMagnitude,
 
     if ((*flags & 0xF0000000) == 0) {
         if (*(s8 *)(context + 0xC0) != 0) {
-            goto return0;
+            return 0;
         }
         if (*(s8 *)(context + 0x310) == 0) {
             status = func_8001E7B8(&x, &y, *(s8 *)(context + 0xC1), 0);
             if ((u8)status == 0) {
-                goto return0;
+                return 0;
             }
 
             direction = 0;
@@ -61,6 +61,5 @@ s32 func_800538C8(u8 *context, u32 *flags, s32 *verticalMagnitude,
         }
     }
 
-return0:
     return 0;
 }

@@ -14,6 +14,17 @@
   ],
   "units": [
     {
+      "name": "func_800538C8",
+      "address": "0x800538C8",
+      "size": "0x1AC",
+      "source": "src/game/800538C8.c",
+      "compiler": "gcc-2.8.1-psx",
+      "aspsx_analog_direction_layout": true,
+      "symbols": {"func_8001E7B8": "0x8001E7B8"},
+      "link": true,
+      "linker_symbols": {"func_8001E7B8": "0x8001E7B8"}
+    },
+    {
       "name": "func_80095C30",
       "address": "0x80095C30",
       "size": "0x174",
