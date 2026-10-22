@@ -36,7 +36,8 @@ class CompilerSweepTests(unittest.TestCase):
                 {"name": "first", "address": "0x80010000", "size": "0x4",
                  "source": "first.c", "symbols": {}},
                 {"name": "second", "address": "0x80010004", "size": "0x4",
-                 "source": "second.c", "symbols": {}},
+                 "source": "second.c",
+                 "symbols": {"D_80020000": "0x80020000"}},
             ],
         }
         with tempfile.TemporaryDirectory() as directory:
@@ -58,6 +59,10 @@ class CompilerSweepTests(unittest.TestCase):
         self.assertEqual(report["candidate_functions"], 1)
         self.assertEqual(report["units"][0]["name"], "second")
         self.assertTrue(compile_unit.call_args.args[0]["link"])
+        self.assertEqual(
+            compile_unit.call_args.args[0]["linker_symbols"],
+            {"D_80020000": "0x80020000"},
+        )
 
 
 if __name__ == "__main__":

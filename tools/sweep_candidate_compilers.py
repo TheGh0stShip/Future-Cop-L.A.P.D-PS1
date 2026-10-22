@@ -92,10 +92,20 @@ def sweep(config_path: Path, executable_path: Path, compilers: list[str],
                 raise ValueError(f"{original['name']}: range outside executable")
             variants = []
             for compiler_index, compiler in enumerate(compilers):
+                linker_symbols = dict(original.get("linker_symbols", {}))
+                linker_symbols.update({
+                    name: value for name, value in original["symbols"].items()
+                    if name.startswith("D_")
+                })
                 # Candidate bytes must be evaluated at their retail address.
                 # Otherwise local MIPS J/JAL targets retain section-relative
                 # encodings and make byte-identical C appear mismatched.
-                unit = {**original, "compiler": compiler, "link": True}
+                unit = {
+                    **original,
+                    "compiler": compiler,
+                    "link": True,
+                    "linker_symbols": linker_symbols,
+                }
                 work = root / f"{unit_index}-{compiler_index}"
                 work.mkdir()
                 try:
@@ -126,6 +136,7 @@ def sweep(config_path: Path, executable_path: Path, compilers: list[str],
         "config": str(config_path),
         "compilers": compilers,
         "linked_at_retail_address": True,
+        "data_symbols_linked": True,
         "candidate_functions": len(units),
         "candidate_bytes": sum(verifier.number(unit["size"]) for unit in units),
         "exact_functions": len(exact),
