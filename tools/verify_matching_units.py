@@ -334,6 +334,58 @@ def restore_aspsx_byte_test_temporary(text):
     return text
 
 
+def use_aspsx_symbolic_address_scratch(text):
+    """Expand two adjacent symbolic addresses through the assembler scratch."""
+    lines = text.splitlines()
+    address = re.compile(r"\s*la\s+\$(\d+),([A-Za-z_][A-Za-z0-9_]*)\s*")
+    for index in range(len(lines) - 1):
+        first = address.fullmatch(lines[index])
+        second = address.fullmatch(lines[index + 1])
+        if not first or not second:
+            continue
+        first_register, first_symbol = first.groups()
+        second_register, second_symbol = second.groups()
+        if "2" in (first_register, second_register):
+            continue
+        lines[index:index + 2] = [
+            f"lui\t$2,%hi({first_symbol})",
+            f"addiu\t${first_register},$2,%lo({first_symbol})",
+            f"lui\t$2,%hi({second_symbol})",
+            f"addiu\t${second_register},$2,%lo({second_symbol})",
+        ]
+        return "\n".join(lines) + "\n"
+    raise ValueError("ASPSX adjacent symbolic-address pattern not found")
+
+
+def reuse_aspsx_call_constant(text):
+    """Reuse the first argument register for equal call constants."""
+    lines = text.splitlines()
+    immediate = re.compile(r"\s*li\s+\$(\d+),([^\s]+)(?:\s+#.*)?\s*")
+    call = re.compile(r"\s*jal\s+.+")
+    for index in range(len(lines) - 2):
+        first = immediate.fullmatch(lines[index])
+        second = immediate.fullmatch(lines[index + 1])
+        if not first or not second:
+            continue
+        source, value = first.groups()
+        second_register, second_value = second.groups()
+        if source != "4" or second_register != "5" or value != second_value:
+            continue
+        for call_index in range(index + 2, min(index + 12, len(lines) - 1)):
+            third = immediate.fullmatch(lines[call_index + 1])
+            if not call.fullmatch(lines[call_index]) or not third:
+                continue
+            third_register, third_value = third.groups()
+            if third_register != "6" or third_value != value:
+                continue
+            if any(re.search(r"\$4(?:,|\s)", line) for line in lines[index + 2:call_index]):
+                continue
+            lines[index + 1] = "addu\t$5,$4,$zero"
+            lines[call_index + 1] = "addu\t$6,$4,$zero"
+            return "\n".join(lines) + "\n"
+    raise ValueError("ASPSX repeated call-constant pattern not found")
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -391,6 +443,14 @@ def validate(config):
         if not isinstance(unit.get("aspsx_restore_byte_test_temp", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_restore_byte_test_temp must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_symbolic_address_scratch", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_symbolic_address_scratch must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_reuse_call_constant", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_reuse_call_constant must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -483,6 +543,12 @@ def compile_unit(unit, config, prefix, work, environment=None):
         processed.write_text(
             restore_aspsx_byte_test_temporary(processed.read_text())
         )
+    if unit.get("aspsx_symbolic_address_scratch", False):
+        processed.write_text(
+            use_aspsx_symbolic_address_scratch(processed.read_text())
+        )
+    if unit.get("aspsx_reuse_call_constant", False):
+        processed.write_text(reuse_aspsx_call_constant(processed.read_text()))
     if marker_lines:
         marker_names = set(small_data_symbols)
         processed.write_text("\n".join(

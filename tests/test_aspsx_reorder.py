@@ -8,13 +8,43 @@ from tools.verify_matching_units import (
     reorder_aspsx_vector_copy_call_setup,
     reuse_aspsx_initialized_zero,
     restore_aspsx_byte_test_temporary,
+    reuse_aspsx_call_constant,
     reuse_aspsx_symbolic_load_destination,
     reorder_aspsx_return_delay_slot,
     reorder_aspsx_jump_store_delay_slot,
+    use_aspsx_symbolic_address_scratch,
 )
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_uses_symbolic_address_scratch_for_adjacent_addresses(self):
+        source = "la\t$4,left\nla\t$3,right\nli\t$2,1\n"
+        expected = (
+            "lui\t$2,%hi(left)\n"
+            "addiu\t$4,$2,%lo(left)\n"
+            "lui\t$2,%hi(right)\n"
+            "addiu\t$3,$2,%lo(right)\n"
+            "li\t$2,1\n"
+        )
+        self.assertEqual(use_aspsx_symbolic_address_scratch(source), expected)
+
+    def test_reuses_equal_call_constants(self):
+        source = (
+            "li\t$4,0x0000001f\t\t# 31\n"
+            "li\t$5,0x0000001f\t\t# 31\n"
+            "sw\t$0,value\n"
+            "jal\tfunction\n"
+            "li\t$6,0x0000001f\t\t# 31\n"
+        )
+        expected = (
+            "li\t$4,0x0000001f\t\t# 31\n"
+            "addu\t$5,$4,$zero\n"
+            "sw\t$0,value\n"
+            "jal\tfunction\n"
+            "addu\t$6,$4,$zero\n"
+        )
+        self.assertEqual(reuse_aspsx_call_constant(source), expected)
+
     def test_restores_byte_test_temporary(self):
         source = (
             "andi\t$17,$17,0x00ff\nbeq\t$17,$0,$L1\n"
