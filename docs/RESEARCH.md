@@ -154,8 +154,12 @@ resolution and receives no matching credit.
 
 The same LIBSPU profile exactly reproduces `SpuSetIRQAddr` at `0x80098BB8`
 and the interrupt callback wrapper at `0x80098C38`, adding 100 verified bytes.
-Their neighboring callback setter and transfer-address routines remain
-source-backed candidates; they are kept separate from the exact manifest.
+Declaring the transfer-address shadow register at `0x8009EEBC` volatile prevents
+the stock 2.7.2 compiler from coalescing its store and reload address. That
+recovers the missing instruction and makes `SpuSetTransferStartAddr` at
+`0x80098EE8` an exact 92-byte function match. Its following four-byte zero is
+object alignment and is not counted as code. The callback setter remains
+unresolved.
 The intervening 212-byte initializer at `0x8008B094` is `_padLoadActInfo`; it
 lays out the mode, capability, and combination tables within a caller-provided
 buffer and installs the two command-processing callbacks.

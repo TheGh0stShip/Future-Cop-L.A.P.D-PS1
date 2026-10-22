@@ -1,6 +1,6 @@
 #include "game/types.h"
 
-extern u16 D_8009EEBC;
+extern volatile u16 D_8009EEBC;
 extern u32 D_8009EECC;
 
 extern u32 func_80097808(s32 register_index, u32 address);

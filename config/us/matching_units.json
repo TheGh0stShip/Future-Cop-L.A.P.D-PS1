@@ -4892,6 +4892,33 @@
       }
     },
     {
+      "name": "func_80098EE8",
+      "address": "0x80098EE8",
+      "size": "0x5C",
+      "source": "src/game/80098EE8.c",
+      "compiler": "gcc-2.7.2-psx",
+      "compiler_flags": [
+        "-quiet",
+        "-msoft-float",
+        "-mgas",
+        "-G0",
+        "-fgnu-linker",
+        "-O3",
+        "-g0",
+        "-funsigned-char"
+      ],
+      "link": true,
+      "linker_symbols": {
+        "D_8009EEBC": "0x8009EEBC",
+        "D_8009EECC": "0x8009EECC"
+      },
+      "symbols": {
+        "D_8009EEBC": "0x8009EEBC",
+        "D_8009EECC": "0x8009EECC",
+        "func_80097808": "0x80097808"
+      }
+    },
+    {
       "name": "func_80098FB8",
       "address": "0x80098FB8",
       "size": "0x24",
