@@ -17,14 +17,16 @@ struct Unk50DACMap {
 
 s32 func_80050DAC(struct Unk50DACMap *map, s32 *position)
 {
+    struct Unk50DACCell *cell;
     s32 x;
     s32 z;
     s32 i;
 
     x = position[0] >> 8;
     z = position[2] >> 8;
-    for (i = 0; i < map->count; i++) {
-        if (map->cells[i].x == x && map->cells[i].z == z) {
+    cell = map->cells;
+    for (i = 0; i < map->count; i++, cell++) {
+        if (cell->x == x && cell->z == z) {
             return i;
         }
     }

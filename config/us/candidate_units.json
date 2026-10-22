@@ -268,16 +268,6 @@
       "symbols": {}
     },
     {
-      "name": "func_80050DAC",
-      "address": "0x80050DAC",
-      "size": "0x60",
-      "source": "src/game/80050DAC.c",
-      "symbols": {},
-      "link": true,
-      "linker_symbols": {},
-      "compiler": "gcc-2.7.2-psx"
-    },
-    {
       "name": "func_80051AC8",
       "address": "0x80051AC8",
       "size": "0x30",

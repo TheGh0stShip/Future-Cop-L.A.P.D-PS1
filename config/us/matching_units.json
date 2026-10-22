@@ -8706,6 +8706,16 @@
       "symbols": {"D_8009F324": "0x8009F324", "D_8009F328": "0x8009F328", "D_8009F710": "0x8009F710", "D_8009F718": "0x8009F718", "D_8009F71C": "0x8009F71C", "func_800410BC": "0x800410BC"}
     },
     {
+      "name": "func_80050DAC",
+      "address": "0x80050DAC",
+      "size": "0x60",
+      "source": "src/game/80050DAC.c",
+      "compiler": "gcc-2.7.2-cdk",
+      "symbols": {},
+      "link": true,
+      "linker_symbols": {}
+    },
+    {
       "name": "func_80078210",
       "address": "0x80078210",
       "size": "0xDC",
