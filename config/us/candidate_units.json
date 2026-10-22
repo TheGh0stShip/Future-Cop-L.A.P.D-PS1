@@ -32,15 +32,6 @@
       "symbols": {}
     },
     {
-      "name": "func_8003B3D8",
-      "address": "0x8003B3D8",
-      "size": "0x20",
-      "source": "src/game/8003B3D8.c",
-      "symbols": {
-        "D_800A6578": "0x800A6578"
-      }
-    },
-    {
       "name": "func_80045028",
       "address": "0x80045028",
       "size": "0x28",

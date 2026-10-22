@@ -362,6 +362,20 @@
       "symbols": {}
     },
     {
+      "name": "func_8003B3D8",
+      "address": "0x8003B3D8",
+      "size": "0x20",
+      "source": "src/game/8003B3D8.c",
+      "compiler": "gcc-2.7.2-cdk",
+      "link": true,
+      "linker_symbols": {
+        "D_800A6578": "0x800A6578"
+      },
+      "symbols": {
+        "D_800A6578": "0x800A6578"
+      }
+    },
+    {
       "name": "func_8003B3F8",
       "address": "0x8003B3F8",
       "size": "0x54",
