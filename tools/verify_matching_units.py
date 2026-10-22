@@ -318,6 +318,22 @@ def reuse_aspsx_initialized_zero(text):
     raise ValueError("ASPSX initialized-zero reuse pattern not found")
 
 
+def restore_aspsx_byte_test_temporary(text):
+    """Restore a temporary register used for byte tests of saved values."""
+    patterns = {
+        "andi\t$17,$17,0x00ff": ("andi\t$2,$17,0x00ff", 1),
+        "beq\t$17,$0,": ("beq\t$2,$0,", 1),
+        "andi\t$16,$16,0x00ff": ("andi\t$2,$16,0x00ff", 2),
+        "beq\t$16,$0,": ("beq\t$2,$0,", 1),
+    }
+    for source, (_, count) in patterns.items():
+        if text.count(source) != count:
+            raise ValueError("ASPSX byte-test temporary pattern not found")
+    for source, (replacement, _) in patterns.items():
+        text = text.replace(source, replacement)
+    return text
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -371,6 +387,10 @@ def validate(config):
         if not isinstance(unit.get("aspsx_reuse_zero_value", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_reuse_zero_value must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_restore_byte_test_temp", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_restore_byte_test_temp must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -458,6 +478,10 @@ def compile_unit(unit, config, prefix, work, environment=None):
     if unit.get("aspsx_reuse_zero_value", False):
         processed.write_text(
             reuse_aspsx_initialized_zero(processed.read_text())
+        )
+    if unit.get("aspsx_restore_byte_test_temp", False):
+        processed.write_text(
+            restore_aspsx_byte_test_temporary(processed.read_text())
         )
     if marker_lines:
         marker_names = set(small_data_symbols)

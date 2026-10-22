@@ -7,23 +7,27 @@ extern s32 D_8009FAC8;
 
 extern u8 func_80048790(void);
 
-void func_800487CC(u8 force)
+void func_800487CC(s32 input)
 {
-    u8 cycle;
+    register s32 cycle __asm__("$16");
+    register s32 force __asm__("$17");
+    s32 current;
 
-    if (force && D_8009FA00[0] == 5) {
+    force = input;
+    if ((u8)force && D_8009FA00[0] == 5) {
         force = 0;
     }
-    if (D_8009FAC8 != 0 && D_8009F760 != D_8009FAC8) {
+    current = D_8009FAC8;
+    if (current != 0 && D_8009F760 != current) {
         D_8009FAB8 = 2;
         force = 0;
     }
-    D_8009F760 = D_8009FAC8;
+    D_8009F760 = current;
     cycle = 0;
-    if (func_80048790() || force) {
+    if (func_80048790() || (u8)force) {
         cycle = 1;
     }
-    if (cycle) {
+    if ((u8)cycle) {
         do {
             D_8009FAB8++;
             if (D_8009FAB8 >= 3) {

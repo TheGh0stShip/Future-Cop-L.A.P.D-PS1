@@ -7,6 +7,7 @@ from tools.verify_matching_units import (
     reorder_aspsx_argument_save_groups,
     reorder_aspsx_vector_copy_call_setup,
     reuse_aspsx_initialized_zero,
+    restore_aspsx_byte_test_temporary,
     reuse_aspsx_symbolic_load_destination,
     reorder_aspsx_return_delay_slot,
     reorder_aspsx_jump_store_delay_slot,
@@ -14,6 +15,19 @@ from tools.verify_matching_units import (
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_restores_byte_test_temporary(self):
+        source = (
+            "andi\t$17,$17,0x00ff\nbeq\t$17,$0,$L1\n"
+            "andi\t$16,$16,0x00ff\nandi\t$16,$16,0x00ff\n"
+            "beq\t$16,$0,$L2\n"
+        )
+        expected = (
+            "andi\t$2,$17,0x00ff\nbeq\t$2,$0,$L1\n"
+            "andi\t$2,$16,0x00ff\nandi\t$2,$16,0x00ff\n"
+            "beq\t$2,$0,$L2\n"
+        )
+        self.assertEqual(restore_aspsx_byte_test_temporary(source), expected)
+
     def test_reuses_initialized_zero_value(self):
         source = (
             "addu\t$2,$0,$zero\nlb\t$3,160($5)\nnop\n"
