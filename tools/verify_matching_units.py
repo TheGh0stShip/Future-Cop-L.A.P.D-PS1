@@ -612,6 +612,83 @@ def normalize_aspsx_packet_cursor(text):
     return text
 
 
+def normalize_aspsx_line_packet(text):
+    """Restore retail allocation and coordinate scheduling for a line packet."""
+    cursor = re.compile(
+        r"lui\t\$3,%hi\(([^)]+)\)[^\n]*\n"
+        r"lui\t\$2,%hi\(([^)]+)\)[^\n]*\n"
+        r"lw\t\$6,%lo\(\1\)\(\$3\)[^\n]*\n"
+        r"#nop[^\n]*\n"
+        r"lw\t\$2,%lo\(\2\)\(\$2\)[^\n]*\n"
+        r"nop[^\n]*\n"
+        r"sltu\t\$2,\$6,\$2\n"
+        r"beq\t\$2,\$0,(\$L\d+)\n"
+        r"addu\t\$2,\$6,28\n\n"
+        r"sw\t\$2,%lo\(\1\)\(\$3\)\n"
+        r"\3:\n"
+        r"li\t\$3,1082130432[^\n]*\n"
+    )
+    match = cursor.search(text)
+    if match is None:
+        raise ValueError("ASPSX line-packet cursor pattern not found")
+    current, limit, done = match.groups()
+    advance = "$L_line_packet_advance"
+    replacement = (
+        f"lui\t$3,%hi({current})\n"
+        f"lw\t$3,%lo({current})($3)\n"
+        f"lui\t$2,%hi({limit})\n"
+        f"lw\t$2,%lo({limit})($2)\n"
+        "nop\n"
+        "sltu\t$2,$3,$2\n"
+        f"bne\t$2,$0,{advance}\n"
+        "addu\t$6,$3,$zero\n"
+        f"j\t{done}\n"
+        "li\t$3,1082130432\n"
+        f"{advance}:\n"
+        "addu\t$2,$6,28\n"
+        ".set\tnoat\n"
+        f"lui\t$at,%hi({current})\n"
+        f"sw\t$2,%lo({current})($at)\n"
+        ".set\tat\n"
+        "li\t$3,1082130432\n"
+        f"{done}:\n"
+    )
+    text = text[:match.start()] + replacement + text[match.end():]
+    schedule = re.compile(
+        r"lw\t\$4,20\(\$sp\)\n"
+        r"#nop[^\n]*\n"
+        r"li\t\$5,2883584[^\n]*\n"
+        r"sw\t\$2,0\(\$6\)\n"
+        r"sw\t\$3,4\(\$6\)\n"
+        r"lw\t\$3,16\(\$sp\)\n"
+        r"#nop[^\n]*\n"
+    )
+    match = schedule.search(text)
+    if match is None:
+        raise ValueError("ASPSX line-packet coordinate pattern not found")
+    replacement = (
+        "li\t$5,2883584\n"
+        "sw\t$2,0($6)\n"
+        "sw\t$3,4($6)\n"
+        "lw\t$3,20($sp)\n"
+        "lw\t$4,16($sp)\n"
+    )
+    start = match.start()
+    text = text[:start] + replacement + text[match.end():]
+    body_start = start + len(replacement)
+    end = text.find("lw\t$31,28($sp)", body_start)
+    if end < 0:
+        raise ValueError("ASPSX line-packet epilogue pattern not found")
+    body = text[body_start:end]
+    body = body.replace("$3", "$tmp").replace("$4", "$3").replace("$tmp", "$4")
+    text = text[:body_start] + body + text[end:]
+    epilogue = re.compile(r"j\t\$31\naddu\t\$sp,\$sp,32\n")
+    text, count = epilogue.subn("addu\t$sp,$sp,32\nj\t$31\nnop\n", text)
+    if count != 1:
+        raise ValueError("ASPSX line-packet return pattern not found")
+    return text
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -701,6 +778,10 @@ def validate(config):
         if not isinstance(unit.get("aspsx_packet_cursor", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_packet_cursor must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_line_packet", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_line_packet must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -819,6 +900,8 @@ def compile_unit(unit, config, prefix, work, environment=None):
         )
     if unit.get("aspsx_packet_cursor", False):
         processed.write_text(normalize_aspsx_packet_cursor(processed.read_text()))
+    if unit.get("aspsx_line_packet", False):
+        processed.write_text(normalize_aspsx_line_packet(processed.read_text()))
     if marker_lines:
         marker_names = set(small_data_symbols)
         processed.write_text("\n".join(

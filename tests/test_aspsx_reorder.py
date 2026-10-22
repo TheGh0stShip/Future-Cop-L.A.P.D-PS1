@@ -8,6 +8,7 @@ from tools.verify_matching_units import (
     hoist_aspsx_small_data_load_before_prologue,
     move_aspsx_load_delay_label,
     normalize_aspsx_indexed_byte_access,
+    normalize_aspsx_line_packet,
     normalize_aspsx_packet_cursor,
     reorder_aspsx_argument_save_groups,
     reorder_aspsx_vector_copy_call_setup,
@@ -23,6 +24,39 @@ from tools.verify_matching_units import (
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_normalizes_line_packet_cursor_and_coordinates(self):
+        source = (
+            "lui\t$3,%hi(D_current) # high\n"
+            "lui\t$2,%hi(D_limit) # high\n"
+            "lw\t$6,%lo(D_current)($3) # linked\n"
+            "#nop # load delay\n"
+            "lw\t$2,%lo(D_limit)($2) # linked\n"
+            "nop # load delay\n"
+            "sltu\t$2,$6,$2\n"
+            "beq\t$2,$0,$L2\n"
+            "addu\t$2,$6,28\n\n"
+            "sw\t$2,%lo(D_current)($3)\n"
+            "$L2:\n"
+            "li\t$3,1082130432 # color\n"
+            "lw\t$4,20($sp)\n"
+            "#nop # load delay\n"
+            "li\t$5,2883584 # y origin\n"
+            "sw\t$2,0($6)\n"
+            "sw\t$3,4($6)\n"
+            "lw\t$3,16($sp)\n"
+            "#nop # load delay\n"
+            "sll\t$2,$4,1\n"
+            "addu\t$2,$2,$3\n"
+            "lw\t$31,28($sp)\n"
+            "j\t$31\n"
+            "addu\t$sp,$sp,32\n"
+        )
+        result = normalize_aspsx_line_packet(source)
+        self.assertIn("bne\t$2,$0,$L_line_packet_advance", result)
+        self.assertIn("lw\t$3,20($sp)\nlw\t$4,16($sp)", result)
+        self.assertIn("sll\t$2,$3,1\naddu\t$2,$2,$4", result)
+        self.assertTrue(result.endswith("addu\t$sp,$sp,32\nj\t$31\nnop\n"))
+
     def test_normalizes_packet_cursor_control_code_and_return(self):
         source = (
             "lui\t$3,%hi(D_current) # high\n"
