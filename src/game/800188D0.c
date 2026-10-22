@@ -107,17 +107,23 @@ struct Matrix3x3L *func_800188D0(u32 yAngle, u32 xAngle, u32 zAngle,
                 matrix->m[2][2] = cx;
             } else {
                 func_8001846C(yAngle, &sy, &cy);
-                sxsy = FIXED_MUL(sx, sy);
-                sxcy = FIXED_MUL(sx, cy);
-                matrix->m[0][0] = FIXED_MUL(cz, cy) + FIXED_MUL(sz, sxsy);
-                matrix->m[0][1] = FIXED_MUL(sz, cx);
-                matrix->m[0][2] = -FIXED_MUL(cz, sy) + FIXED_MUL(sz, sxcy);
-                matrix->m[1][0] = -FIXED_MUL(sz, cy) + FIXED_MUL(cz, sxsy);
-                matrix->m[1][1] = FIXED_MUL(cz, cx);
-                matrix->m[1][2] = FIXED_MUL(sz, sy) + FIXED_MUL(cz, sxcy);
-                matrix->m[2][0] = FIXED_MUL(cx, sy);
                 matrix->m[2][1] = -sx;
-                matrix->m[2][2] = FIXED_MUL(cx, cy);
+                sz >>= 2;
+                sx >>= 2;
+                sxsy = (sz * sx) >> 14;
+                cz >>= 2;
+                cy >>= 2;
+                sy >>= 2;
+                cx >>= 2;
+                sxcy = (sx * cz) >> 14;
+                matrix->m[0][0] = (cz * cy + sxsy * sy) >> 12;
+                matrix->m[0][1] = (sz * cx) >> 12;
+                matrix->m[0][2] = (sxsy * cy - cz * sy) >> 12;
+                matrix->m[1][0] = (sxcy * sy - sz * cy) >> 12;
+                matrix->m[1][1] = (cz * cx) >> 12;
+                matrix->m[1][2] = (sz * sy + sxcy * cy) >> 12;
+                matrix->m[2][0] = (cx * sy) >> 12;
+                matrix->m[2][2] = (cx * cy) >> 12;
             }
         }
     }
