@@ -15,7 +15,10 @@ struct Unk3CA80 {
 
 void func_8003CA80(struct Unk3CA80 *object)
 {
-    object->callback(7, object, 0, 0);
+    s32 zero;
+
+    zero = 0;
+    object->callback(7, object, zero, zero);
     object->unk07 = -1;
     object->unk14 = 0;
     object->unk06 = 0;
