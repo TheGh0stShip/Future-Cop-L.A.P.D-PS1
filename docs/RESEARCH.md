@@ -207,3 +207,10 @@ Generalizing the same rule to direct jumps and calls also resolves the adjacent
 64-byte transfer-mode getter and 60-byte IRQ callback setter. The callback
 setter additionally uses the proven stack-pop return fill; both retain their
 source-level SDK behavior unchanged.
+
+The GCC 2.6.3 lane also resolves three non-library candidates after small
+source-shape corrections. Ordering the request pointer after both zeroed fields
+matches the 76-byte request wrapper at `0x8003A8C0`; assigning the definition
+byte before the active flag preserves the retail load-delay nop in the 184-byte
+object initializer at `0x80042504`; and naming the two high-bit masks hoists
+their constants exactly in the 80-byte transform at `0x80060DD8`.

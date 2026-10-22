@@ -24,8 +24,8 @@ void func_8003A8C0(s32 arg0, u8 arg1, s32 arg2, s32 arg3)
 
     request.handler = D_8003B2D0;
     request.unk04 = 0;
-    request.args = &args;
     request.unk0C = 0;
+    request.args = &args;
     args.arg0 = arg0;
     args.arg1 = arg1;
     args.arg2 = arg2;

@@ -39,8 +39,8 @@ s32 func_80042504(s32 message, struct Unk42504Object *object, struct Unk42504Spa
     func_8002AD58(2);
     object->flags |= 0x20000D;
     def = spawn->def;
-    object->activeA1 = 1;
     object->valueA0 = def->value24;
+    object->activeA1 = 1;
     object->valueA2 = def->value26;
     object->valueA3 = def->value27;
     object->valueA4 = def->value28;
