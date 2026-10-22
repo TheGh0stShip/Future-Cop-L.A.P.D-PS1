@@ -21,6 +21,7 @@ s32 func_8004D9EC(struct Entity *target, u8 kind, u8 value)
 {
     struct EntityMessage *message;
     s32 bit;
+    s32 result;
 
     if (D_8009F7A8 == 0xFFFF) {
         return 0;
@@ -31,11 +32,12 @@ s32 func_8004D9EC(struct Entity *target, u8 kind, u8 value)
         bit <<= 1;
         message++;
     }
+    result = 1;
     message->target = target;
     D_8009F7A8 |= bit;
     message->kind = kind;
     message->value = value;
-    message->timer = 600;
     message->id = target->id;
-    return 1;
+    message->timer = 600;
+    return result;
 }
