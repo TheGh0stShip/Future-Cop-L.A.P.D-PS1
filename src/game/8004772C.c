@@ -24,14 +24,20 @@ extern u8 func_80024358(struct SoundBank *bank, struct SoundVoice *voice, s32 pa
 u8 func_8004772C(struct SoundBank *bank, struct SoundVoice *voice, s32 pan, s32 volume,
                  s32 extra)
 {
-    if (bank->count == 0) {
-        return 0;
+    u8 cursor;
+    u8 result;
+
+    if (bank->count != 0) {
+        cursor = bank->cursor + 1;
+        bank->cursor = cursor;
+        if (cursor >= bank->count) {
+            bank->cursor = 0;
+        }
+        voice->sample = &bank->samples[bank->cursor];
+        func_800477D8(voice, pan, volume, extra);
+        result = func_80024358(bank, voice, voice->pan, voice->volume, voice->extra);
+    } else {
+        result = 0;
     }
-    bank->cursor++;
-    if (bank->cursor >= bank->count) {
-        bank->cursor = 0;
-    }
-    voice->sample = &bank->samples[bank->cursor];
-    func_800477D8(voice, pan, volume, extra);
-    return func_80024358(bank, voice, voice->pan, voice->volume, voice->extra);
+    return result;
 }

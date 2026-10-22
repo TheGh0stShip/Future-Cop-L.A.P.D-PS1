@@ -309,21 +309,6 @@
       "compiler": "gcc-2.7.2-psx"
     },
     {
-      "name": "func_8004772C",
-      "address": "0x8004772C",
-      "size": "0xAC",
-      "source": "src/game/8004772C.c",
-      "symbols": {
-        "func_80024358": "0x80024358",
-        "func_800477D8": "0x800477D8"
-      },
-      "link": true,
-      "linker_symbols": {
-        "func_80024358": "0x80024358",
-        "func_800477D8": "0x800477D8"
-      }
-    },
-    {
       "name": "func_80048790",
       "address": "0x80048790",
       "size": "0x3C",
