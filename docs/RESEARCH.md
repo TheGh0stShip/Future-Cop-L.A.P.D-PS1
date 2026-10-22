@@ -199,3 +199,7 @@ reordering that the pinned MASPSX bridge now applies only when a unit opts in.
 The same evidence-driven bridge reproduces ASPSX placement of a load-delay
 `nop` before a loop label. This resolves the 40-byte PAD status wait at
 `0x8008AE44`; without the relocation, only its branch displacement differs.
+ASPSX also splits a terminal symbolic store, retaining its `lui` before
+`jr $ra` while placing the low-half `sw` in the delay slot. Reproducing that
+opt-in transformation makes the 48-byte LIBSPU state setter at `0x80098F48`
+an exact GCC 2.6.3 match.

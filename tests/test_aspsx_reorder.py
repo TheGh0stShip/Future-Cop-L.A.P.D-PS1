@@ -3,6 +3,7 @@ import unittest
 from tools.verify_matching_units import (
     move_aspsx_load_delay_label,
     reorder_aspsx_return_delay_slot,
+    reorder_aspsx_return_store_delay_slot,
 )
 
 
@@ -45,6 +46,26 @@ class AspsxReorderTests(unittest.TestCase):
         source = "$L2:\nnop # DEBUG: Reuse of '$3'\n# $L3: # DEBUG: skipped\n"
         with self.assertRaisesRegex(ValueError, "pattern not found"):
             move_aspsx_load_delay_label(source)
+
+    def test_moves_terminal_store_into_return_delay_slot(self):
+        source = "sw\t$2,%lo(value)($at)\nj\t$31\nnop  # DEBUG: branch/jump\n"
+        expected = "j\t$31\nsw\t$2,%lo(value)($at)\n"
+        self.assertEqual(reorder_aspsx_return_store_delay_slot(source), expected)
+
+    def test_expands_symbolic_terminal_store_around_return(self):
+        source = "sw\t$2,value\nj\t$31\nnop  # DEBUG: branch/jump\n"
+        expected = (
+            ".set\tnoat\n"
+            "lui\t$at,%hi(value)\n"
+            "j\t$31\n"
+            "sw\t$2,%lo(value)($at)\n"
+            ".set\tat\n"
+        )
+        self.assertEqual(reorder_aspsx_return_store_delay_slot(source), expected)
+
+    def test_rejects_nonstore_return_fill(self):
+        with self.assertRaisesRegex(ValueError, "pattern not found"):
+            reorder_aspsx_return_store_delay_slot("addu\t$2,$3,$zero\nj\t$31\nnop\n")
 
 
 if __name__ == "__main__":
