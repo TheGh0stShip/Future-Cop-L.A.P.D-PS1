@@ -7952,6 +7952,17 @@
       "link": true,
       "linker_symbols": {},
       "symbols": {}
+    },
+    {
+      "name": "func_8002283C",
+      "address": "0x8002283C",
+      "size": "0xB8",
+      "source": "src/game/8002283C.c",
+      "compiler": "gcc-2.7.2-cdk",
+      "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G4", "-fgnu-linker", "-O2"],
+      "link": true,
+      "linker_symbols": {"D_800A0968": "0x800A0968", "func_800222CC": "0x800222CC", "func_800227BC": "0x800227BC", "func_800477D8": "0x800477D8", "_gp": "0x8009F214"},
+      "symbols": {"D_800A0968": "0x800A0968", "func_800222CC": "0x800222CC", "func_800227BC": "0x800227BC", "func_800477D8": "0x800477D8"}
     }
   ]
 }
