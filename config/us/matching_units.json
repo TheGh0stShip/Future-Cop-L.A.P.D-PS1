@@ -8071,6 +8071,28 @@
       "link": true,
       "linker_symbols": {"D_8009F770": "0x8009F770", "D_8009F774": "0x8009F774", "func_80069D68": "0x80069D68", "_gp": "0x8009F214"},
       "symbols": {"D_8009F770": "0x8009F770", "D_8009F774": "0x8009F774", "func_80069D68": "0x80069D68"}
+    },
+    {
+      "name": "func_80019D90",
+      "address": "0x80019D90",
+      "size": "0xE0",
+      "source": "src/game/80019D90.c",
+      "compiler": "gcc-2.7.2-psx",
+      "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G0", "-fgnu-linker", "-O2"],
+      "link": true,
+      "linker_symbols": {"D_8009FA0C": "0x8009FA0C"},
+      "symbols": {"D_8009FA0C": "0x8009FA0C"}
+    },
+    {
+      "name": "func_80019E70",
+      "address": "0x80019E70",
+      "size": "0xE4",
+      "source": "src/game/80019E70.c",
+      "compiler": "gcc-2.7.2-psx",
+      "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G0", "-fgnu-linker", "-O2"],
+      "link": true,
+      "linker_symbols": {"D_8009FA0C": "0x8009FA0C"},
+      "symbols": {"D_8009FA0C": "0x8009FA0C"}
     }
   ]
 }
