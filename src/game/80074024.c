@@ -26,6 +26,7 @@ extern void func_8003C14C(struct Unk74024 *object, struct Unk74024Def *def);
 struct Unk74024 *func_80074024(struct Unk74024Def *def)
 {
     struct Unk74024 *object;
+    s32 size;
 
     object = func_80017EBC(0x68, 1);
     if (object == 0) {
@@ -34,8 +35,9 @@ struct Unk74024 *func_80074024(struct Unk74024Def *def)
     func_8003C14C(object, def);
     object->update = func_80073BBC;
     object->unk64 = 0;
+    size = def->height * def->width;
     def->flags |= 0x10;
     object->unk08 = 0;
-    object->unk0A = def->height * def->width * 2;
+    object->unk0A = size * 2;
     return object;
 }

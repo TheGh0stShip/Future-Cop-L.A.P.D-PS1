@@ -4204,6 +4204,24 @@
       "compiler": "gcc-2.7.2-psx"
     },
     {
+      "name": "func_80074024",
+      "address": "0x80074024",
+      "size": "0x94",
+      "source": "src/game/80074024.c",
+      "symbols": {
+        "func_80017EBC": "0x80017EBC",
+        "func_8003C14C": "0x8003C14C",
+        "func_80073BBC": "0x80073BBC"
+      },
+      "link": true,
+      "linker_symbols": {
+        "func_80017EBC": "0x80017EBC",
+        "func_8003C14C": "0x8003C14C",
+        "func_80073BBC": "0x80073BBC"
+      },
+      "compiler": "gcc-2.7.2-psx"
+    },
+    {
       "name": "func_800740B8",
       "address": "0x800740B8",
       "size": "0x4C",
