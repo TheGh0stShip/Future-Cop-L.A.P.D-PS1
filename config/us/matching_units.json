@@ -14,6 +14,24 @@
   ],
   "units": [
     {
+      "name": "func_80076878",
+      "address": "0x80076878",
+      "size": "0x4C",
+      "source": "src/game/80076878.c",
+      "symbols": {
+        "func_800181D4": "0x800181D4",
+        "func_80019C38": "0x80019C38",
+        "func_800767E4": "0x800767E4"
+      },
+      "link": true,
+      "linker_symbols": {
+        "func_800181D4": "0x800181D4",
+        "func_80019C38": "0x80019C38",
+        "func_800767E4": "0x800767E4"
+      },
+      "compiler": "gcc-2.7.2-psx"
+    },
+    {
       "name": "func_8001E620",
       "address": "0x8001E620",
       "size": "0x198",
