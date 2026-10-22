@@ -11,14 +11,21 @@ void func_80044EF8(void)
 {
     s32 i;
     u8 *entry;
+    u8 *other;
+    u8 value;
 
-    for (i = 0; i < 0x46; i++) {
-        D_800A1830[i] = 0xFF;
-        D_800A1880[i] = 0xFF;
-    }
-    entry = D_800A18D0;
-    for (i = 0x3B; i >= 0; i--) {
+    entry = D_800A1830;
+    other = D_800A1880;
+    i = 0;
+    do {
+        i++;
         *entry++ = 0xFF;
+        *other++ = 0xFF;
+    } while (i < 0x46);
+    entry = D_800A18D0;
+    value = 0xFF;
+    for (i = 0x3B; i >= 0; i--) {
+        *entry++ = value;
     }
     D_8009F75C = 0;
     for (i = 0; i < 0x6E; i++) {
