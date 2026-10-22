@@ -1,6 +1,7 @@
 import unittest
 
 from tools.verify_matching_units import (
+    hoist_aspsx_small_data_load_before_prologue,
     move_aspsx_load_delay_label,
     reorder_aspsx_argument_save_groups,
     reuse_aspsx_symbolic_load_destination,
@@ -10,6 +11,38 @@ from tools.verify_matching_units import (
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_hoists_independent_small_data_load_before_prologue(self):
+        source = (
+            "subu\t$sp,$sp,72\n"
+            "sw\t$19,60($sp)\n"
+            "lw\t$19,88($sp)\n"
+            "sw\t$18,56($sp)\n"
+            "addu\t$18,$6,$zero\n"
+            "lbu\t$2,%gp_rel(enabled)($gp)\n"
+            "sw\t$31,64($sp)\n"
+        )
+        expected = (
+            "lbu\t$2,%gp_rel(enabled)($gp)\n"
+            "subu\t$sp,$sp,72\n"
+            "sw\t$19,60($sp)\n"
+            "lw\t$19,88($sp)\n"
+            "sw\t$18,56($sp)\n"
+            "addu\t$18,$6,$zero\n"
+            "sw\t$31,64($sp)\n"
+        )
+        self.assertEqual(
+            hoist_aspsx_small_data_load_before_prologue(source), expected
+        )
+
+    def test_rejects_small_data_load_after_control_flow(self):
+        source = (
+            "subu\t$sp,$sp,72\n"
+            "beq\t$2,$0,$L1\n"
+            "lbu\t$2,%gp_rel(enabled)($gp)\n"
+        )
+        with self.assertRaisesRegex(ValueError, "pattern not found"):
+            hoist_aspsx_small_data_load_before_prologue(source)
+
     def test_reuses_symbolic_load_destination_when_scratch_dies(self):
         source = "lw\t$3,value\n#nop # DEBUG: independent instruction\nli\t$2,2\n"
         expected = (

@@ -100,6 +100,36 @@ def move_aspsx_load_delay_label(text):
     raise ValueError("ASPSX load-delay-label pattern not found")
 
 
+def hoist_aspsx_small_data_load_before_prologue(text):
+    """Hoist an independent small-data load ahead of saved-register setup."""
+    lines = text.splitlines()
+    stack_setup = re.compile(r"\s*subu\s+\$sp,\$sp,\d+\s*")
+    small_load = re.compile(
+        r"\s*l(?:bu|b|hu|h|w)\s+\$2,%gp_rel\([^)]+\)\(\$gp\)\s*"
+    )
+    setup_instruction = re.compile(
+        r"\s*(?:sw|lw|addu)\s+\$\d+,[^#]+\s*"
+    )
+    for setup_index, line in enumerate(lines):
+        if not stack_setup.fullmatch(line):
+            continue
+        for load_index in range(setup_index + 1, min(setup_index + 13, len(lines))):
+            if not small_load.fullmatch(lines[load_index]):
+                continue
+            intervening = lines[setup_index + 1:load_index]
+            if not all(
+                not item.strip()
+                or item.lstrip().startswith("#")
+                or setup_instruction.fullmatch(item)
+                for item in intervening
+            ):
+                continue
+            load = lines.pop(load_index)
+            lines.insert(setup_index, load)
+            return "\n".join(lines) + "\n"
+    raise ValueError("ASPSX small-data-load prologue pattern not found")
+
+
 def reorder_aspsx_argument_save_groups(text):
     """Order adjacent saved-register argument moves by argument register."""
     lines = text.splitlines()
@@ -216,6 +246,10 @@ def validate(config):
             raise ValueError(
                 f"{unit['name']}: aspsx_move_load_delay_label must be boolean"
             )
+        if not isinstance(unit.get("aspsx_hoist_small_data_load", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_hoist_small_data_load must be boolean"
+            )
         if not isinstance(unit.get("aspsx_reorder_jump_store", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_reorder_jump_store must be boolean"
@@ -287,6 +321,10 @@ def compile_unit(unit, config, prefix, work, environment=None):
         processed.write_text(reorder_aspsx_return_delay_slot(processed.read_text()))
     if unit.get("aspsx_move_load_delay_label", False):
         processed.write_text(move_aspsx_load_delay_label(processed.read_text()))
+    if unit.get("aspsx_hoist_small_data_load", False):
+        processed.write_text(
+            hoist_aspsx_small_data_load_before_prologue(processed.read_text())
+        )
     if unit.get("aspsx_reorder_jump_store", False):
         processed.write_text(
             reorder_aspsx_jump_store_delay_slot(processed.read_text())
