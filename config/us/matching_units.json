@@ -7975,6 +7975,18 @@
       "link": true,
       "linker_symbols": {"func_80017EBC": "0x80017EBC"},
       "symbols": {"func_80017EBC": "0x80017EBC"}
+    },
+    {
+      "name": "func_80031B40",
+      "address": "0x80031B40",
+      "size": "0xAC",
+      "source": "src/game/80031B40.c",
+      "compiler": "gcc-2.7.2-cdk",
+      "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G4", "-fgnu-linker", "-O2"],
+      "small_data_symbols": {"D_8009F6F8": 4},
+      "link": true,
+      "linker_symbols": {"_gp": "0x8009F214"},
+      "symbols": {"_gp": "0x8009F214", "D_8009F6F8": "0x8009F6F8"}
     }
   ]
 }

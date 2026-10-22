@@ -24,20 +24,27 @@ struct Vec3s32 {
 };
 
 extern struct Unk31Node *D_8009F6F8;
-extern int abs(int value);
 
 s32 func_80031B40(struct Vec3s32 *position, s32 radius)
 {
     struct Unk31Node *node;
     s32 found;
+    s32 delta;
+    s32 sign;
 
     found = 0;
     for (node = D_8009F6F8; node != 0; node = node->next) {
-        if ((node->flags & 0x40) &&
-            abs(position->x - (node->x << 8)) - radius <= node->extentX << 4 &&
-            abs(position->z - (node->z << 8)) - radius <= node->extentZ << 4) {
-            found = 1;
-            break;
+        if (node->flags & 0x40) {
+            delta = position->x - (node->x << 8);
+            sign = delta >> 31;
+            if (((sign + delta) ^ sign) - radius <= node->extentX << 4) {
+                delta = position->z - (node->z << 8);
+                sign = delta >> 31;
+                if (((sign + delta) ^ sign) - radius <= node->extentZ << 4) {
+                    found = 1;
+                    break;
+                }
+            }
         }
     }
     return found;
