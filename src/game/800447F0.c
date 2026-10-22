@@ -34,7 +34,7 @@ struct Unk447F0 *func_800447F0(s32 def)
     object->update = D_80044610;
     object->period = object->basePeriod;
     if (object->flags8D & 0x30) {
-        object->period = object->basePeriod << 1;
+        object->period <<= 1;
     }
     object->phase = 0;
     return object;

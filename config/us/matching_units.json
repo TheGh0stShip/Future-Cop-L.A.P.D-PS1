@@ -8152,6 +8152,17 @@
       "symbols": {"D_8009F340": "0x8009F340", "D_800A7938": "0x800A7938", "func_800458E8": "0x800458E8", "func_800460D4": "0x800460D4", "func_80046698": "0x80046698", "func_80046B04": "0x80046B04", "func_8004772C": "0x8004772C"}
     },
     {
+      "name": "func_800447F0",
+      "address": "0x800447F0",
+      "size": "0x9C",
+      "source": "src/game/800447F0.c",
+      "compiler": "gcc-2.7.2-cdk",
+      "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G0", "-fgnu-linker", "-O2"],
+      "symbols": {"D_80044610": "0x80044610", "func_80017EBC": "0x80017EBC", "func_800181D4": "0x800181D4", "func_80043430": "0x80043430"},
+      "link": true,
+      "linker_symbols": {"D_80044610": "0x80044610", "func_80017EBC": "0x80017EBC", "func_800181D4": "0x800181D4", "func_80043430": "0x80043430"}
+    },
+    {
       "name": "func_80042470",
       "address": "0x80042470",
       "size": "0x94",
