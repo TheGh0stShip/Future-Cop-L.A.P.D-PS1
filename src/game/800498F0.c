@@ -19,10 +19,10 @@ void func_800498F0(struct GridObject *object)
 
     if (object->cell >= 0) {
         cell = &D_8009F780[object->cell];
-        if (*cell == object) {
+        node = *cell;
+        if (node == object) {
             *cell = object->next;
         } else {
-            node = *cell;
             while (node != 0) {
                 if (node->next == object) {
                     node->next = object->next;
