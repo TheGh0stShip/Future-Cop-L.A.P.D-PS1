@@ -1,15 +1,9 @@
 #include "../../include/game/types.h"
 
-u32 func_80093F58(int textured, int dither, u32 mode)
+u32 func_80093F58(s32 dfe, s32 dtd, u32 tpage)
 {
-    u32 command = 0xE1000000;
-    u32 value = mode & 0x9FF;
-
-    if (textured != 0) {
-        command |= 0x200;
-    }
-    if (dither != 0) {
-        value |= 0x400;
-    }
-    return command | value;
+    return 0xE1000000
+        | (dtd != 0 ? 0x200 : 0)
+        | (dfe != 0 ? 0x400 : 0)
+        | (tpage & 0x9FF);
 }
