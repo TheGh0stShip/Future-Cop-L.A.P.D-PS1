@@ -6,13 +6,20 @@ struct BufferShape {
     u8 pad_E4[5];
     u8 height;
     u8 pad_EA[2];
-    u8 *data;
+    u32 data;
 };
 
-u8 *func_8008B05C(struct BufferShape *shape)
+u32 func_8008B05C(struct BufferShape *shape)
 {
-    u32 width_bytes = ((shape->width + 1) >> 1) * 4;
-    u32 height_bytes = ((shape->height * 5 + 3) & 0xFFC) + 4;
+    register s32 width __asm__("$2");
+    register u32 height __asm__("$3");
+    register u32 data __asm__("$4");
 
-    return shape->data + width_bytes + height_bytes;
+    width = shape->width;
+    height = shape->height;
+    data = shape->data;
+    width = ((width + 1) >> 1) * 4;
+    height = (height * 5 + 3) & 0xFFC;
+    height += 4;
+    return width + height + data;
 }

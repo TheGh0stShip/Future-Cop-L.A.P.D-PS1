@@ -70,3 +70,8 @@ functions were not yet present in the matching manifest. The largest exact
 shared sequences were 260 and 128 bytes. These are candidate correspondences,
 not matching-decompilation credit: a function counts only after independently
 written C passes the USA retail-byte verifier.
+
+The 56-byte shared routine at `0x8008B05C` was identified from PsyQ library
+symbol corpora as `_padGetActSize`. Its recovered C computes the controller
+command-buffer extent from fields at offsets `0xE3`, `0xE9`, and `0xEC`; the
+result passes the full retail-byte verifier.
