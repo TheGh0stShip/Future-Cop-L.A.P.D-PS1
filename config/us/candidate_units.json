@@ -1141,17 +1141,6 @@
       "symbols": {
         "D_8009DD90": "0x8009DD90"
       }
-    },
-    {
-      "name": "func_800177AC",
-      "address": "0x800177AC",
-      "size": "0xB4",
-      "source": "src/game/800177AC.c",
-      "compiler": "gcc-2.7.2-psx",
-      "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G0", "-fgnu-linker", "-O2"],
-      "link": true,
-      "linker_symbols": {"D_8009F9E4": "0x8009F9E4", "func_8001A81C": "0x8001A81C"},
-      "symbols": {"D_8009F9E4": "0x8009F9E4", "func_8001A81C": "0x8001A81C"}
     }
   ]
 }

@@ -5,6 +5,7 @@ from tools.verify_matching_units import (
     hoist_aspsx_small_data_load_before_prologue,
     move_aspsx_load_delay_label,
     reorder_aspsx_argument_save_groups,
+    reorder_aspsx_vector_copy_call_setup,
     reuse_aspsx_symbolic_load_destination,
     reorder_aspsx_return_delay_slot,
     reorder_aspsx_jump_store_delay_slot,
@@ -12,6 +13,21 @@ from tools.verify_matching_units import (
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_reorders_vector_copy_call_setup(self):
+        source = (
+            "lw\t$2,D_camera\n# load delay\nlw\t$3,0($5)\n"
+            "lw\t$4,4($5)\nlw\t$6,8($5)\nsw\t$3,124($2)\n"
+            "sw\t$4,128($2)\nsw\t$6,132($2)\nlw\t$4,D_camera\n"
+            "addu\t$6,$sp,16\njal\ttransform\naddu\t$4,$4,40\n"
+        )
+        expected = (
+            "lw\t$2,D_camera\nnop\naddu\t$4,$2,$zero\n"
+            "lw\t$3,0($5)\nlw\t$6,4($5)\nlw\t$7,8($5)\n"
+            "sw\t$3,124($2)\nsw\t$6,128($2)\nsw\t$7,132($2)\n"
+            "addu\t$4,$4,40\njal\ttransform\naddu\t$6,$sp,16\n"
+        )
+        self.assertEqual(reorder_aspsx_vector_copy_call_setup(source), expected)
+
     def test_fills_symbolic_load_delay_with_independent_increment(self):
         source = "sll\t$2,$18,1\naddu\t$18,$18,1\nlw\t$3,D_8009F5B0\nnop\naddu\t$2,$2,$3\n"
         expected = "sll\t$2,$18,1\nlw\t$3,D_8009F5B0\naddu\t$18,$18,1\naddu\t$2,$2,$3\n"

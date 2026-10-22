@@ -246,6 +246,51 @@ def fill_aspsx_symbolic_load_delay_slot(text):
     raise ValueError("ASPSX symbolic load-delay increment pattern not found")
 
 
+def reorder_aspsx_vector_copy_call_setup(text):
+    """Reproduce retail scheduling around a copied vector and following call."""
+    lines = text.splitlines()
+    meaningful = [
+        index for index, line in enumerate(lines)
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    for offset in range(len(meaningful) - 10):
+        indices = meaningful[offset:offset + 11]
+        block = [lines[index].strip() for index in indices]
+        first_load = re.fullmatch(r"lw\s+\$2,([A-Za-z_][A-Za-z0-9_]*)", block[0])
+        second_load = re.fullmatch(r"lw\s+\$4,([A-Za-z_][A-Za-z0-9_]*)", block[7])
+        call = re.fullmatch(r"jal\s+([A-Za-z_][A-Za-z0-9_]*)", block[9])
+        if first_load is None or second_load is None or call is None:
+            continue
+        if first_load.group(1) != second_load.group(1):
+            continue
+        if block[1:7] != [
+            "lw\t$3,0($5)", "lw\t$4,4($5)", "lw\t$6,8($5)",
+            "sw\t$3,124($2)", "sw\t$4,128($2)", "sw\t$6,132($2)",
+        ]:
+            continue
+        if block[8] != "addu\t$6,$sp,16" or block[10] != "addu\t$4,$4,40":
+            continue
+        symbol = first_load.group(1)
+        callee = call.group(1)
+        replacement = [
+            f"lw\t$2,{symbol}",
+            "nop",
+            "addu\t$4,$2,$zero",
+            "lw\t$3,0($5)",
+            "lw\t$6,4($5)",
+            "lw\t$7,8($5)",
+            "sw\t$3,124($2)",
+            "sw\t$6,128($2)",
+            "sw\t$7,132($2)",
+            "addu\t$4,$4,40",
+            f"jal\t{callee}",
+            "addu\t$6,$sp,16",
+        ]
+        lines[indices[0]:indices[-1] + 1] = replacement
+        return "\n".join(lines) + "\n"
+    raise ValueError("ASPSX vector-copy call-setup pattern not found")
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -291,6 +336,10 @@ def validate(config):
         if not isinstance(unit.get("aspsx_fill_load_delay", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_fill_load_delay must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_reorder_vector_copy_call", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_reorder_vector_copy_call must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -370,6 +419,10 @@ def compile_unit(unit, config, prefix, work, environment=None):
     if unit.get("aspsx_fill_load_delay", False):
         processed.write_text(
             fill_aspsx_symbolic_load_delay_slot(processed.read_text())
+        )
+    if unit.get("aspsx_reorder_vector_copy_call", False):
+        processed.write_text(
+            reorder_aspsx_vector_copy_call_setup(processed.read_text())
         )
     if marker_lines:
         marker_names = set(small_data_symbols)
