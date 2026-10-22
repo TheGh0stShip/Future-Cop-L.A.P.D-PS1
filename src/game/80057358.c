@@ -13,13 +13,16 @@ struct Unk57358 {
 void func_80057358(struct Unk57358 *object, s32 amount)
 {
     struct Unk57358Info *info;
+    s32 charge;
 
     info = object->info;
-    if (info->charge < 0x100) {
+    charge = info->charge;
+    if (charge < 0x100) {
         amount /= 4;
         if (amount >= 0x100) {
             amount = 0xFF;
         }
-        info->charge += amount;
+        charge += amount;
+        info->charge = charge;
     }
 }

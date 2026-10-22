@@ -215,15 +215,6 @@
       "symbols": {}
     },
     {
-      "name": "func_80057358",
-      "address": "0x80057358",
-      "size": "0x4C",
-      "source": "src/game/80057358.c",
-      "symbols": {},
-      "link": true,
-      "linker_symbols": {}
-    },
-    {
       "name": "func_8006062C",
       "address": "0x8006062C",
       "size": "0x3C",
