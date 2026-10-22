@@ -14,6 +14,23 @@
   ],
   "units": [
     {
+      "name": "func_8008D784",
+      "address": "0x8008D784",
+      "size": "0x28",
+      "source": "src/game/8008D784.c",
+      "compiler": "gcc-2.7.2-cdk",
+      "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G0", "-fgnu-linker", "-O2"],
+      "link": true,
+      "linker_symbols": {
+        "func_8008DC40": "0x8008DC40",
+        "func_8008DE20": "0x8008DE20"
+      },
+      "symbols": {
+        "func_8008DC40": "0x8008DC40",
+        "func_8008DE20": "0x8008DE20"
+      }
+    },
+    {
       "name": "func_80076878",
       "address": "0x80076878",
       "size": "0x4C",
