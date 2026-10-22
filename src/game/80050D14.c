@@ -13,10 +13,10 @@ struct Unk50D14Arg {
 };
 
 extern void func_8004F188(struct Unk50D14 *object, struct Unk50D14Arg *arg);
-extern s32 func_80050B54(struct Unk50D14 *object, s32 arg1, struct Unk50D14Arg *arg);
-extern u8 func_8005027C(struct Unk50D14 *object, s32 arg1, struct Unk50D14Arg *arg);
+extern u8 func_80050B54(struct Unk50D14 *object, s32 arg1, struct Unk50D14Arg *arg);
+extern s32 func_8005027C(struct Unk50D14 *object, s32 arg1, struct Unk50D14Arg *arg);
 
-u8 func_80050D14(struct Unk50D14 *object, s32 arg1, struct Unk50D14Arg *arg)
+s32 func_80050D14(struct Unk50D14 *object, s32 arg1, struct Unk50D14Arg *arg)
 {
     if (arg->unk0C != 0) {
         func_8004F188(object, arg);

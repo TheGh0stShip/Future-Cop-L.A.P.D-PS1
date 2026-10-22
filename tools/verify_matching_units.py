@@ -140,6 +140,9 @@ def reuse_aspsx_symbolic_load_destination(text):
     symbolic_load = re.compile(
         r"\s*(l[whbu]+)\s+\$(\d+),([A-Za-z_][A-Za-z0-9_]*)\s*"
     )
+    address = re.compile(
+        r"\s*addiu\s+\$(\d+),\$(\d+),%lo\(([^)]+)\)(?:\s+#.*)?\s*"
+    )
     overwrite = re.compile(r"\s*(?:li|lui|addu|addiu|ori)\s+\$(\d+)(?:,|\s).*")
     for index in range(len(lines) - 2):
         symbolic_match = symbolic_load.fullmatch(lines[index])
@@ -152,6 +155,16 @@ def reuse_aspsx_symbolic_load_destination(text):
             return "\n".join(lines) + "\n"
         high_match = high.fullmatch(lines[index])
         load_match = load.fullmatch(lines[index + 1])
+        address_match = address.fullmatch(lines[index + 1])
+        if high_match and address_match:
+            scratch, symbol = high_match.groups()
+            destination, base, address_symbol = address_match.groups()
+            if symbol == address_symbol and scratch == base and scratch != destination:
+                lines[index] = f"lui\t${destination},%hi({symbol})"
+                lines[index + 1] = (
+                    f"addiu\t${destination},${destination},%lo({symbol})"
+                )
+                return "\n".join(lines) + "\n"
         next_index = index + 2
         while next_index < len(lines) and (
             not lines[next_index].strip()

@@ -25,6 +25,19 @@ class AspsxReorderTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "pattern not found"):
             reuse_aspsx_symbolic_load_destination(source)
 
+    def test_reuses_symbolic_address_destination(self):
+        source = (
+            "lui\t$2,%hi(table) # high\n"
+            "addiu\t$16,$2,%lo(table)\n"
+            "lw\t$4,0($16)\n"
+        )
+        expected = (
+            "lui\t$16,%hi(table)\n"
+            "addiu\t$16,$16,%lo(table)\n"
+            "lw\t$4,0($16)\n"
+        )
+        self.assertEqual(reuse_aspsx_symbolic_load_destination(source), expected)
+
     def test_orders_adjacent_argument_save_groups(self):
         source = (
             "sw\t$20,32($sp)\n"
