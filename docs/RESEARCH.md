@@ -86,3 +86,9 @@ The same SDK source-shape comparison resolved the 260-byte routine at
 `0x8008E61C` as `CdIntToPos`. GCC emits the retail register allocation only
 when the binary-coded-decimal conversion is expressed as the original nested
 inline helper; a macro or cached `/75` intermediate produces different code.
+
+Jump-destination-normalized comparison then identified the adjacent LIBPAD 4.2
+load-information routines at `0x8008AE8C` and `0x8008AF10`. Their reconstructed
+C contributes another 464 exact bytes. The dispatcher selects command emitters
+from `sequence_step`; the response decoder fills mode and actuator metadata,
+tracks combination storage, and rejects command buffers larger than 128 bytes.
