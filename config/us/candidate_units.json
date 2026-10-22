@@ -1000,27 +1000,6 @@
       "linker_symbols": {}
     },
     {
-      "name": "func_800596C4",
-      "address": "0x800596C4",
-      "size": "0xFC",
-      "source": "src/game/800596C4.c",
-      "symbols": {
-        "D_8009AF78": "0x8009AF78",
-        "D_8009AF94": "0x8009AF94",
-        "func_80014C64": "0x80014C64",
-        "func_80017668": "0x80017668",
-        "func_80019668": "0x80019668"
-      },
-      "link": true,
-      "linker_symbols": {
-        "D_8009AF78": "0x8009AF78",
-        "D_8009AF94": "0x8009AF94",
-        "func_80014C64": "0x80014C64",
-        "func_80017668": "0x80017668",
-        "func_80019668": "0x80019668"
-      }
-    },
-    {
       "name": "func_80059BA0",
       "address": "0x80059BA0",
       "size": "0x5C",

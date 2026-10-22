@@ -25,7 +25,7 @@ struct Unk596C4Effect {
     s32 color;
 };
 
-extern struct Unk596C4Effect D_8009AF78;
+extern s32 D_8009AF88;
 extern s32 D_8009AF94[];
 
 extern void func_80017668(struct Unk596C4Part *part, s32 arg1, s32 *out);
@@ -38,6 +38,7 @@ void func_800596C4(struct Unk596C4 *object)
     s32 from[3];
     s32 to[3];
     s32 index;
+    s32 z;
 
     index = object->state->part;
     if (index < 0) {
@@ -47,7 +48,10 @@ void func_800596C4(struct Unk596C4 *object)
     func_80017668(part, 0, from);
     to[0] = from[0] + ((part->x << 4) >> 8);
     to[1] = from[1] + ((part->y << 4) >> 8);
-    to[2] = from[2] + ((part->z << 4) >> 8);
-    D_8009AF78.color = D_8009AF94[func_80019668() % 3];
-    func_80014C64(from, to, &D_8009AF78);
+    z = from[2] + ((part->z << 4) >> 8);
+    __asm__("" : : "r"(z));
+    to[2] = z;
+    D_8009AF88 = D_8009AF94[func_80019668() % 3];
+    func_80014C64(from, to,
+                  (struct Unk596C4Effect *)((u8 *)&D_8009AF88 - 0x10));
 }
