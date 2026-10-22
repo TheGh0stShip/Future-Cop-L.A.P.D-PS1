@@ -7,7 +7,7 @@ VENV_PYTHON := $(VENV)/bin/python
 VENV_STAMP := $(VENV)/.installed
 EXE := baseroms/us/SLUS_007.39
 
-.PHONY: all setup toolchain verify split function-inventory verify-matching verify-noncode report check extract inventory inventory-noncode offline-decomp-status clean
+.PHONY: all setup toolchain verify split function-inventory verify-matching verify-noncode sweep-candidates report check extract inventory inventory-noncode offline-decomp-status clean
 
 all: split
 
@@ -43,6 +43,9 @@ verify-matching: verify toolchain
 
 verify-noncode: verify extract
 	$(PYTHON) tools/verify_noncode.py
+
+sweep-candidates: verify toolchain
+	$(PYTHON) tools/sweep_candidate_compilers.py
 
 report:
 	$(PYTHON) tools/generate_decomp_report.py
