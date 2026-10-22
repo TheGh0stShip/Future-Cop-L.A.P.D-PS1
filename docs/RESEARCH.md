@@ -45,10 +45,13 @@ Sources:
 
 ## Compiler hypothesis
 
-GCC 2.8.1 PSX with `-O2 -G0` is the leading hypothesis, based on the matching
-pipeline proven in the read-only BattleTanx: Global Assault PS1 project and the
-first fifty-seven exact Future Cop functions. GCC 2.7.2 PSX remains pinned for
-per-unit testing. These trivial matches do not establish the compiler for game-owned
-non-leaf functions; stack layout, register allocation, switch lowering,
-division, GTE scheduling, and small-data behavior still require representative
-matches.
+GCC 2.8.1 PSX with `-O2 -G0` is the leading game-code hypothesis, based on the
+matching pipeline proven in the read-only BattleTanx: Global Assault PS1 project
+and exact Future Cop units. GCC 2.7.2 PSX is also proven for a distinct lane:
+the callback wrappers at `0x80091480`, `0x800914B0`, `0x800914E0`,
+`0x80091510`, and `0x80091574`, plus the two-call loop at `0x8001EB6C`, match
+only after selecting the pinned 2.7.2 compiler profile. The C behavior was
+unchanged; the decisive differences were scheduling and epilogue placement.
+Compiler selection therefore remains per-unit evidence rather than a global
+assumption. Switch lowering, division, GTE scheduling, and small-data behavior
+still require representative matches.
