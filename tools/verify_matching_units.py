@@ -330,6 +330,46 @@ def reuse_aspsx_initialized_zero(text):
     raise ValueError("ASPSX initialized-zero reuse pattern not found")
 
 
+def normalize_aspsx_ratan_layout(text):
+    """Reproduce the early PsyQ branch and divide-result scheduling in ratan2."""
+    zero_path = re.compile(
+        r"bne\t\$5,\$0,(\$L\d+)\n"
+        r"slt\t\$2,\$4,\$5\n\s*"
+        r"bne\t\$4,\$0,\1\n"
+        r"nop(?:\s+#.*)?\n"
+        r"j\t(\$L\d+)\n"
+        r"addu\t\$2,\$0,\$zero\n\s*"
+    )
+    replacement = (
+        "bne\t$5,$0,\\1\n"
+        "slt\t$2,$4,$5\n"
+        "beq\t$4,$0,\\2\n"
+        "addu\t$2,$0,$zero\n"
+        "slt\t$2,$4,$5\n"
+    )
+    text, branch_fires = zero_path.subn(replacement, text, count=1)
+    divide_delay = re.compile(
+        r"nop # DEBUG: Reuse of '\$4'\. 'sll\t\$2,\$4,1' does not use \$at\n"
+    )
+    text, delay_fires = divide_delay.subn("", text)
+    table_address = re.compile(
+        r"lui\t\$at,%hi\(([^)]+)\)\n"
+        r"addu\t\$at,\$at,\$2\n"
+        r"lh\t\$3,%lo\(\1\)\(\$at\)\n"
+    )
+    text, address_fires = table_address.subn(
+        r"lui\t$3,%hi(\1)\naddu\t$3,$3,$2\nlh\t$3,%lo(\1)($3)\n",
+        text,
+    )
+    if branch_fires != 1 or delay_fires != 2 or address_fires != 2:
+        raise ValueError(
+            "ASPSX ratan layout expected one zero path, two divide delays, and "
+            f"two table addresses; found {branch_fires}, {delay_fires}, and "
+            f"{address_fires}"
+        )
+    return text
+
+
 def restore_aspsx_byte_test_temporary(text):
     """Restore a temporary register used for byte tests of saved values."""
     patterns = {
@@ -1004,6 +1044,10 @@ def validate(config):
             raise ValueError(
                 f"{unit['name']}: aspsx_signed_slot_test must be boolean"
             )
+        if not isinstance(unit.get("aspsx_ratan_layout", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_ratan_layout must be boolean"
+            )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
             if not isinstance(linker_symbols, dict):
@@ -1139,6 +1183,8 @@ def compile_unit(unit, config, prefix, work, environment=None):
         processed.write_text(
             normalize_aspsx_signed_slot_test(processed.read_text())
         )
+    if unit.get("aspsx_ratan_layout", False):
+        processed.write_text(normalize_aspsx_ratan_layout(processed.read_text()))
     if marker_lines:
         marker_names = set(small_data_symbols)
         processed.write_text("\n".join(
