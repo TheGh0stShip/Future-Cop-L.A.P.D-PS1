@@ -6,7 +6,6 @@
   "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G0", "-fgnu-linker", "-O2"],
   "maspsx_flags": ["--dont-expand-li"],
   "units": [
-    {"name": "func_8008E61C", "address": "0x8008E61C", "size": "0x104", "source": "src/game/8008E61C.c", "symbols": {}},
     {"name": "func_80033608", "address": "0x80033608", "size": "0xA0", "source": "src/game/80033608.c", "symbols": {}},
     {"name": "func_8003C500", "address": "0x8003C500", "size": "0x90", "source": "src/game/8003C500.c", "symbols": {"D_800A7040": "0x800A7040", "func_8003C4C4": "0x8003C4C4"}},
     {"name": "func_8003B65C", "address": "0x8003B65C", "size": "0x48", "source": "src/game/8003B65C.c", "symbols": {}},

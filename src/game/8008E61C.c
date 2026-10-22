@@ -7,16 +7,16 @@ struct CdlLOC {
     u8 track;
 };
 
-#define INT_TO_BCD(value) ((((value) / 10) << 4) + ((value) % 10))
-
 struct CdlLOC *func_8008E61C(s32 sector, struct CdlLOC *location)
 {
-    s32 time;
+    inline s32 encode_bcd(s32 value)
+    {
+        return ((value / 10) << 4) + (value % 10);
+    }
 
     sector += 150;
-    time = sector / 75;
-    location->sector = INT_TO_BCD(sector % 75);
-    location->second = INT_TO_BCD(time % 60);
-    location->minute = INT_TO_BCD(time / 60);
+    location->sector = encode_bcd(sector % 75);
+    location->second = encode_bcd((sector / 75) % 60);
+    location->minute = encode_bcd((sector / 75) / 60);
     return location;
 }

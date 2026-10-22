@@ -81,3 +81,8 @@ Read-only comparison with `hansbonini/psx_tomba` revision
 LIBPAD 4.2 object ownership, signed temporary types, and the complete
 `0xF0`-byte controller-port layout. That repository was used as reference
 evidence only; no files were copied into this tree.
+
+The same SDK source-shape comparison resolved the 260-byte routine at
+`0x8008E61C` as `CdIntToPos`. GCC emits the retail register allocation only
+when the binary-coded-decimal conversion is expressed as the original nested
+inline helper; a macro or cached `/75` intermediate produces different code.
