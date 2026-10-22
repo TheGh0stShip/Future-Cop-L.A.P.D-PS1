@@ -34,6 +34,19 @@ def run(args, **kwargs):
     subprocess.run([str(arg) for arg in args], check=True, **kwargs)
 
 
+def tool_environment(environment=None):
+    result = dict(os.environ if environment is None else environment)
+    library_dir = (
+        ROOT / ".toolchain/mipsel-binutils/root/usr/lib/x86_64-linux-gnu"
+    )
+    if library_dir.is_dir():
+        current = result.get("LD_LIBRARY_PATH", "")
+        result["LD_LIBRARY_PATH"] = str(library_dir) + (
+            os.pathsep + current if current else ""
+        )
+    return result
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -50,6 +63,16 @@ def validate(config):
             raise ValueError(f"{unit['name']}: range must be positive and word-aligned")
         if not (ROOT / unit["source"]).is_file():
             raise ValueError(f"{unit['name']}: source does not exist")
+        if not isinstance(unit.get("link", False), bool):
+            raise ValueError(f"{unit['name']}: link must be boolean")
+        if unit.get("link", False):
+            linker_symbols = unit.get("linker_symbols", {})
+            if not isinstance(linker_symbols, dict):
+                raise ValueError(f"{unit['name']}: linker_symbols must be an object")
+            for symbol, value in linker_symbols.items():
+                if not isinstance(symbol, str) or not symbol:
+                    raise ValueError(f"{unit['name']}: invalid linker symbol")
+                number(value)
         ranges.append((start, start + size, unit["name"]))
     ranges.sort()
     for left, right in zip(ranges, ranges[1:]):
@@ -58,6 +81,7 @@ def validate(config):
 
 
 def compile_unit(unit, config, prefix, work, environment=None):
+    environment = tool_environment(environment)
     compiler = unit.get("compiler", config["compiler"])
     cc1 = ROOT / ".toolchain" / compiler / "cc1"
     if not cc1.is_file():
@@ -65,9 +89,12 @@ def compile_unit(unit, config, prefix, work, environment=None):
     source = ROOT / unit["source"]
     preprocessed = work / "unit.i"
     raw_asm = work / "raw.s"
+    maspsx_input = work / "maspsx-input.s"
     processed = work / "processed.s"
     linked_asm = work / "linked.s"
     obj = work / "unit.o"
+    linked = work / "unit.elf"
+    linker_script = work / "unit.ld"
     binary = work / "unit.bin"
     flags = unit.get("compiler_flags", config["compiler_flags"])
     cpp = ROOT / ".toolchain" / compiler / "cpp"
@@ -77,16 +104,65 @@ def compile_unit(unit, config, prefix, work, environment=None):
     run([cc1, *flags, preprocessed, "-o", raw_asm], env=environment)
 
     maspsx = ROOT / ".toolchain" / f"maspsx-{MASPSX_COMMIT}" / "maspsx.py"
+    maspsx_flags = list(unit.get("maspsx_flags", config["maspsx_flags"]))
+    maspsx_flags.extend(
+        flag for flag in flags if flag.startswith("-G") and len(flag) > 2
+    )
+    small_data_symbols = unit.get("small_data_symbols", {})
+    marker_lines = [
+        f".comm {name},{number(size)}"
+        for name, size in sorted(small_data_symbols.items())
+    ]
+    maspsx_input.write_text(
+        "\n".join(marker_lines) + ("\n" if marker_lines else "")
+        + raw_asm.read_text()
+    )
     with processed.open("w") as output:
-        run(["python3", maspsx, *unit.get("maspsx_flags", config["maspsx_flags"]),
-             raw_asm], stdout=output, env=environment)
-    definitions = "".join(f".set {name}, {number(value):#x}\n"
-                          for name, value in sorted(unit["symbols"].items()))
+        run(["python3", maspsx, *maspsx_flags, maspsx_input],
+            stdout=output, env=environment)
+    if marker_lines:
+        marker_names = set(small_data_symbols)
+        processed.write_text("\n".join(
+            line for line in processed.read_text().splitlines()
+            if not (
+                line.lstrip().startswith(".comm")
+                and line.lstrip().split(None, 1)[1].split(",", 1)[0]
+                in marker_names
+            )
+        ) + "\n")
+    link_defined = set(unit.get("linker_symbols", {}))
+    link_defined.update(small_data_symbols)
+    definitions = "".join(
+        f".set {name}, {number(value):#x}\n"
+        for name, value in sorted(unit["symbols"].items())
+        if not unit.get("link", False) or name not in link_defined
+    )
     linked_asm.write_text(definitions + processed.read_text())
 
     run([tool("as", prefix), "-EL", "-march=r3000", "-mabi=32", "-o", obj, linked_asm],
         env=environment)
-    run([tool("objcopy", prefix), "-O", "binary", "-j", ".text", obj, binary],
+    binary_input = obj
+    if unit.get("link", False):
+        address = number(unit["address"])
+        linker_script.write_text(
+            "SECTIONS\n{\n"
+            f"  . = {address:#x};\n"
+            "  .text : SUBALIGN(4) { *(.text) }\n"
+            "  /DISCARD/ : { *(.MIPS.abiflags) *(.reginfo) *(.pdr) "
+            "*(.gnu.attributes) }\n"
+            "}\n"
+        )
+        command = [tool("ld", prefix), "-EL", "-m", "elf32ltsmip", "-T",
+                   linker_script, "-e", f"{address:#x}", "-o", linked, obj]
+        linker_symbols = dict(unit.get("linker_symbols", {}))
+        linker_symbols.update({
+            name: unit["symbols"][name] for name in small_data_symbols
+        })
+        for name, value in sorted(linker_symbols.items()):
+            command.extend(["--defsym", f"{name}={number(value):#x}"])
+        run(command, env=environment)
+        binary_input = linked
+    run([tool("objcopy", prefix), "-O", "binary", "-j", ".text", binary_input, binary],
         env=environment)
     return binary.read_bytes()
 

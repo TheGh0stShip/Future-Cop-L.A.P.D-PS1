@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 ANALYSIS = ROOT / "analysis/analysis.json"
 MATCHING_UNITS = ROOT / "config/us/matching_units.json"
+BOUNDARY_OVERRIDES = ROOT / "config/us/function_boundary_overrides.json"
 DEFAULT_OUTPUT = ROOT / "build/report.json"
 
 
@@ -46,6 +47,23 @@ def canonical_functions() -> list[dict]:
         function for function in analysis["functions"]
         if not function.get("is_data") and not function.get("alias_of")
     ]
+    if BOUNDARY_OVERRIDES.is_file():
+        overrides = json.loads(BOUNDARY_OVERRIDES.read_text())
+        by_address = {function["addr"]: function for function in functions}
+        for override in overrides["functions"]:
+            address = int(override["address"], 0)
+            function = by_address.get(address)
+            if function is None:
+                raise ValueError(
+                    f"boundary override start is not catalogued: 0x{address:08X}"
+                )
+            for value in override.get("remove_starts", []):
+                removed = by_address.pop(int(value, 0), None)
+                if removed is None:
+                    raise ValueError(f"boundary override removal is not catalogued: {value}")
+            function["size"] = int(override["size"], 0)
+            function["end"] = address + function["size"]
+        functions = list(by_address.values())
     functions.sort(key=lambda function: function["addr"])
     for left, right in zip(functions, functions[1:]):
         if left["end"] > right["addr"]:

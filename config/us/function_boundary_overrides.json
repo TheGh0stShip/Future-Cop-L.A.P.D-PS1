@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "description": "Reviewed corrections for analyzer splits caused by a gp-relative load before the stack-frame prologue.",
+  "functions": [
+    {"address": "0x80031990", "size": "0x44", "remove_starts": ["0x80031994"]},
+    {"address": "0x8003D0AC", "size": "0x44", "remove_starts": ["0x8003D0B0"]},
+    {"address": "0x8003FA34", "size": "0xA0", "remove_starts": ["0x8003FA38"]},
+    {"address": "0x80060E50", "size": "0x24", "remove_starts": ["0x80060E54"]},
+    {"address": "0x80061860", "size": "0x6C", "remove_starts": ["0x80061864"]},
+    {"address": "0x800634F4", "size": "0x74", "remove_starts": ["0x800634F8"]}
+  ]
+}

@@ -4,6 +4,12 @@
   "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G0", "-fgnu-linker", "-O2"],
   "maspsx_flags": ["--dont-expand-li"],
   "units": [
+    {"name": "func_80031984", "address": "0x80031984", "size": "0xC", "source": "src/game/80031984.c", "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G4", "-fgnu-linker", "-O2"], "small_data_symbols": {"D_8009F6F8": 4}, "link": true, "linker_symbols": {"_gp": "0x8009F214"}, "symbols": {"_gp": "0x8009F214", "D_8009F6F8": "0x8009F6F8"}},
+    {"name": "func_800609F4", "address": "0x800609F4", "size": "0xC", "source": "src/game/800609F4.c", "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G4", "-fgnu-linker", "-O2"], "small_data_symbols": {"D_8009F7F8": 4}, "link": true, "linker_symbols": {"_gp": "0x8009F214"}, "symbols": {"_gp": "0x8009F214", "D_8009F7F8": "0x8009F7F8"}},
+    {"name": "func_80060A00", "address": "0x80060A00", "size": "0xC", "source": "src/game/80060A00.c", "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G4", "-fgnu-linker", "-O2"], "small_data_symbols": {"D_8009F7F8": 4}, "link": true, "linker_symbols": {"_gp": "0x8009F214"}, "symbols": {"_gp": "0x8009F214", "D_8009F7F8": "0x8009F7F8"}},
+    {"name": "func_80069D58", "address": "0x80069D58", "size": "0x10", "source": "src/game/80069D58.c", "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G4", "-fgnu-linker", "-O2"], "small_data_symbols": {"D_8009F840": 1}, "link": true, "linker_symbols": {"_gp": "0x8009F214"}, "symbols": {"_gp": "0x8009F214", "D_8009F840": "0x8009F840"}},
+    {"name": "func_8006A880", "address": "0x8006A880", "size": "0xC", "source": "src/game/8006A880.c", "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G4", "-fgnu-linker", "-O2"], "small_data_symbols": {"D_8009F848": 4}, "link": true, "linker_symbols": {"_gp": "0x8009F214"}, "symbols": {"_gp": "0x8009F214", "D_8009F848": "0x8009F848"}},
+    {"name": "func_8006A88C", "address": "0x8006A88C", "size": "0xC", "source": "src/game/8006A88C.c", "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G4", "-fgnu-linker", "-O2"], "small_data_symbols": {"D_8009F848": 4}, "link": true, "linker_symbols": {"_gp": "0x8009F214"}, "symbols": {"_gp": "0x8009F214", "D_8009F848": "0x8009F848"}},
     {
       "name": "func_800195D0",
       "address": "0x800195D0",
