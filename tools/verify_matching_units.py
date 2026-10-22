@@ -504,6 +504,120 @@ def normalize_aspsx_analog_direction_layout(text):
     return text
 
 
+def normalize_aspsx_state_entry_layout(text):
+    """Reproduce retail scheduling for state-entry initialization and copying."""
+    initialization = re.compile(
+        r"addu\t\$13,\$3,680\n"
+        r"sw\t\$0,680\(\$3\)\n"
+        r"sh\t\$2,12\(\$13\)\n"
+        r"lw\t\$2,12\(\$13\)\n"
+        r"#nop # DEBUG: 'addu\t\$14,\$3,683' does not load from \$2\n"
+        r"addu\t\$14,\$3,683\n"
+    )
+    initialization_replacement = (
+        "addu\t$13,$3,680\n"
+        "addu\t$14,$3,683\n"
+        "sw\t$0,680($3)\n"
+        "sh\t$2,12($13)\n"
+        "lw\t$2,12($13)\n"
+        "li\t$3,65536\n"
+    )
+    text, initialization_fires = initialization.subn(
+        initialization_replacement, text, count=1
+    )
+    text, first_mask_fires = re.subn(
+        r"li\t\$10,65536\s+# 0x00010000\n"
+        r"or\t\$2,\$2,\$10\n",
+        "or\t$2,$2,$3\n",
+        text,
+        count=1,
+    )
+    text, second_mask_fires = re.subn(
+        r"li\t\$6,134217728\s+# 0x08000000\n"
+        r"or\t\$2,\$2,\$6\n",
+        "li\t$3,134217728\n"
+        "or\t$2,$2,$3\n",
+        text,
+        count=1,
+    )
+
+    call_setup = re.compile(
+        r"addu\t\$4,\$3,604\n"
+        r"addu\t\$5,\$13,\$zero\n"
+        r"addu\t\$6,\$0,\$zero\n"
+        r"li\t\$2,1\s+# 0x00000001\n"
+        r"sw\t\$2,60\(\$5\)\n"
+        r"addu\t\$2,\$5,60\n"
+        r"sw\t\$2,52\(\$5\)\n"
+        r"li\t\$2,16\s+# 0x00000010\n"
+        r"jal\tfunc_80013BD8\n"
+        r"sw\t\$2,64\(\$5\)\n"
+    )
+    call_replacement = (
+        "addu\t$3,$13,60\n"
+        "li\t$2,1\n"
+        "sw\t$2,60($13)\n"
+        "li\t$2,16\n"
+        "addu\t$5,$13,$zero\n"
+        "sw\t$3,52($13)\n"
+        "sw\t$2,4($3)\n"
+        "lw\t$4,172($16)\n"
+        "addu\t$6,$0,$zero\n"
+        "jal\tfunc_80013BD8\n"
+        "addu\t$4,$4,604\n"
+    )
+    text, call_fires = call_setup.subn(call_replacement, text, count=1)
+
+    final_copies = re.compile(
+        r"lw\t\$3,172\(\$16\)\n"
+        r"#nop # DEBUG: 'lw\t\$2,92\(\$16\)' does not load from \$3\n"
+        r"lw\t\$2,92\(\$16\)\n"
+        r"nop # DEBUG: Reuse of '\$2'\. 'sw\t\$2,656\(\$3\)' does not use \$at\n"
+        r"sw\t\$2,656\(\$3\)\n"
+        r"lw\t\$3,172\(\$16\)\n"
+        r"#nop # DEBUG: 'lw\t\$2,96\(\$16\)' does not load from \$3\n"
+        r"lw\t\$2,96\(\$16\)\n"
+        r"nop # DEBUG: Reuse of '\$2'\. 'sw\t\$2,660\(\$3\)' does not use \$at\n"
+        r"sw\t\$2,660\(\$3\)\n"
+        r"lw\t\$3,172\(\$16\)\n"
+        r"#nop # DEBUG: 'lw\t\$2,100\(\$16\)' does not load from \$3\n"
+        r"lw\t\$2,100\(\$16\)\n"
+        r"nop # DEBUG: Reuse of '\$2'\. 'sw\t\$2,664\(\$3\)' does not use \$at\n"
+        r"sw\t\$2,664\(\$3\)\n"
+        r"lw\t\$31,20\(\$sp\)\n"
+        r"#nop # DEBUG: 'lw\t\$16,16\(\$sp\)' does not load from \$31\n"
+        r"lw\t\$16,16\(\$sp\)\n"
+        r"#nop # DEBUG: 'j\t\$31' does not load from \$16\n"
+        r"j\t\$31\n"
+        r"addu\t\$sp,\$sp,24\n"
+    )
+    final_replacement = (
+        "lw\t$2,172($16)\n"
+        "lw\t$3,92($16)\n"
+        "lw\t$4,96($16)\n"
+        "lw\t$5,100($16)\n"
+        "sw\t$3,656($2)\n"
+        "sw\t$4,660($2)\n"
+        "sw\t$5,664($2)\n"
+        "lw\t$31,20($sp)\n"
+        "lw\t$16,16($sp)\n"
+        "addu\t$sp,$sp,24\n"
+        "j\t$31\n"
+        "nop\n"
+    )
+    text, final_fires = final_copies.subn(final_replacement, text, count=1)
+    if (
+        initialization_fires, first_mask_fires, second_mask_fires,
+        call_fires, final_fires,
+    ) != (1, 1, 1, 1, 1):
+        raise ValueError(
+            "ASPSX state entry layout expected five unique patterns; found "
+            f"{initialization_fires}, {first_mask_fires}, {second_mask_fires}, "
+            f"{call_fires}, {final_fires}"
+        )
+    return text
+
+
 def restore_aspsx_byte_test_temporary(text):
     """Restore a temporary register used for byte tests of saved values."""
     patterns = {
@@ -1186,6 +1300,10 @@ def validate(config):
             raise ValueError(
                 f"{unit['name']}: aspsx_analog_direction_layout must be boolean"
             )
+        if not isinstance(unit.get("aspsx_state_entry_layout", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_state_entry_layout must be boolean"
+            )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
             if not isinstance(linker_symbols, dict):
@@ -1326,6 +1444,10 @@ def compile_unit(unit, config, prefix, work, environment=None):
     if unit.get("aspsx_analog_direction_layout", False):
         processed.write_text(
             normalize_aspsx_analog_direction_layout(processed.read_text())
+        )
+    if unit.get("aspsx_state_entry_layout", False):
+        processed.write_text(
+            normalize_aspsx_state_entry_layout(processed.read_text())
         )
     if marker_lines:
         marker_names = set(small_data_symbols)

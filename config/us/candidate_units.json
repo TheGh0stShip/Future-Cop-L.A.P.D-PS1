@@ -115,19 +115,6 @@
       "linker_symbols": {"func_8001846C": "0x8001846C"}
     },
     {
-      "name": "func_800516A0",
-      "address": "0x800516A0",
-      "size": "0x208",
-      "source": "src/game/800516A0.c",
-      "symbols": {
-        "func_80013BD8": "0x80013BD8"
-      },
-      "link": true,
-      "linker_symbols": {
-        "func_80013BD8": "0x80013BD8"
-      }
-    },
-    {
       "name": "func_800207CC",
       "address": "0x800207CC",
       "size": "0x2D0",
