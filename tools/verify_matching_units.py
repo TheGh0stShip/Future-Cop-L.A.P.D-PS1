@@ -223,6 +223,29 @@ def reuse_aspsx_symbolic_load_destination(text):
     raise ValueError("ASPSX symbolic-load-destination pattern not found")
 
 
+def fill_aspsx_symbolic_load_delay_slot(text):
+    """Move an independent increment into a symbolic load's delay slot."""
+    lines = text.splitlines()
+    increment = re.compile(r"\s*addu\s+\$(\d+),\$(\d+),1\s*")
+    load = re.compile(r"\s*lw\s+\$(\d+),(.+)")
+    for index in range(len(lines) - 2):
+        increment_match = increment.fullmatch(lines[index])
+        load_match = load.fullmatch(lines[index + 1])
+        if increment_match is None or load_match is None:
+            continue
+        if increment_match.group(1) != increment_match.group(2):
+            continue
+        if increment_match.group(1) == load_match.group(1):
+            continue
+        if f"${increment_match.group(1)}" in load_match.group(2):
+            continue
+        if not lines[index + 2].strip().startswith("nop"):
+            continue
+        lines[index:index + 3] = [lines[index + 1], lines[index]]
+        return "\n".join(lines) + "\n"
+    raise ValueError("ASPSX symbolic load-delay increment pattern not found")
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -264,6 +287,10 @@ def validate(config):
         if not isinstance(unit.get("aspsx_reuse_load_destination", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_reuse_load_destination must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_fill_load_delay", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_fill_load_delay must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -339,6 +366,10 @@ def compile_unit(unit, config, prefix, work, environment=None):
     if unit.get("aspsx_reuse_load_destination", False):
         processed.write_text(
             reuse_aspsx_symbolic_load_destination(processed.read_text())
+        )
+    if unit.get("aspsx_fill_load_delay", False):
+        processed.write_text(
+            fill_aspsx_symbolic_load_delay_slot(processed.read_text())
         )
     if marker_lines:
         marker_names = set(small_data_symbols)

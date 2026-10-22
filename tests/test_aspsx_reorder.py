@@ -1,6 +1,7 @@
 import unittest
 
 from tools.verify_matching_units import (
+    fill_aspsx_symbolic_load_delay_slot,
     hoist_aspsx_small_data_load_before_prologue,
     move_aspsx_load_delay_label,
     reorder_aspsx_argument_save_groups,
@@ -11,6 +12,17 @@ from tools.verify_matching_units import (
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_fills_symbolic_load_delay_with_independent_increment(self):
+        source = "sll\t$2,$18,1\naddu\t$18,$18,1\nlw\t$3,D_8009F5B0\nnop\naddu\t$2,$2,$3\n"
+        expected = "sll\t$2,$18,1\nlw\t$3,D_8009F5B0\naddu\t$18,$18,1\naddu\t$2,$2,$3\n"
+        self.assertEqual(fill_aspsx_symbolic_load_delay_slot(source), expected)
+
+    def test_rejects_dependent_symbolic_load_delay_increment(self):
+        with self.assertRaises(ValueError):
+            fill_aspsx_symbolic_load_delay_slot("addu\t$3,$3,1\nlw\t$3,D_8009F5B0\nnop\n")
+        with self.assertRaises(ValueError):
+            fill_aspsx_symbolic_load_delay_slot("addu\t$3,$3,1\nlw\t$2,0($3)\nnop\n")
+
     def test_hoists_independent_small_data_load_before_prologue(self):
         source = (
             "subu\t$sp,$sp,72\n"

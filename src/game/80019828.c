@@ -16,7 +16,7 @@ void func_80019828(void)
     s32 shift;
 
     D_8009F5B0 = func_80017EBC(0x800, 2);
-    for (input = 0, i = input; i < 0x400; i++, input++) {
+    for (input = 0, i = input; i < 0x400; input++) {
         value = func_800187C8(func_80018818(input));
         shift = 0x15;
         if (value != 0) {
@@ -25,7 +25,9 @@ void func_80019828(void)
         if (shift > 0) {
             value >>= shift;
         }
-        D_8009F5B0[i] = (value << 5) | shift;
+        value <<= 5;
+        value |= shift;
+        D_8009F5B0[i++] = value;
     }
     func_800197A8(0x457);
 }
