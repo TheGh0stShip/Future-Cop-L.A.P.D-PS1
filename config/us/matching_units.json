@@ -4856,6 +4856,21 @@
       "symbols": {}
     },
     {
+      "name": "func_80095E90", "address": "0x80095E90", "size": "0x34",
+      "source": "src/game/80095E90.c", "compiler": "gcc-2.8.1-psx",
+      "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G0", "-fgnu-linker", "-O3", "-g0", "-funsigned-char"],
+      "link": true,
+      "symbols": {"func_80091480": "0x80091480", "func_80096150": "0x80096150"}
+    },
+    {
+      "name": "func_80095EC4", "address": "0x80095EC4", "size": "0x8C",
+      "source": "src/game/80095EC4.c", "compiler": "gcc-2.7.2-psx",
+      "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G0", "-fgnu-linker", "-O3", "-g0", "-funsigned-char"],
+      "link": true,
+      "linker_symbols": {"D_8009E8B4": "0x8009E8B4", "D_8009E8F4": "0x8009E8F4", "D_8009E938": "0x8009E938"},
+      "symbols": {"D_8009E8B4": "0x8009E8B4", "D_8009E8F4": "0x8009E8F4", "D_8009E938": "0x8009E938"}
+    },
+    {
       "name": "func_80095FE8",
       "address": "0x80095FE8",
       "size": "0xC",
@@ -4867,6 +4882,20 @@
       "source": "src/game/80096070.c", "compiler": "gcc-2.7.2-cdk",
       "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G0", "-fgnu-linker", "-O3", "-g0", "-funsigned-char"],
       "link": true, "symbols": {"func_800962D0": "0x800962D0"}
+    },
+    {
+      "name": "func_80096090", "address": "0x80096090", "size": "0x3C",
+      "source": "src/game/80096090.c", "compiler": "gcc-2.7.2-cdk",
+      "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G0", "-fgnu-linker", "-O3", "-g0", "-funsigned-char"],
+      "link": true,
+      "symbols": {"func_8009635C": "0x8009635C", "func_80096484": "0x80096484"}
+    },
+    {
+      "name": "func_800960CC", "address": "0x800960CC", "size": "0x3C",
+      "source": "src/game/800960CC.c", "compiler": "gcc-2.7.2-cdk",
+      "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G0", "-fgnu-linker", "-O3", "-g0", "-funsigned-char"],
+      "link": true,
+      "symbols": {"func_800963F0": "0x800963F0", "func_80096484": "0x80096484"}
     },
     {
       "name": "func_80096108", "address": "0x80096108", "size": "0x24",
