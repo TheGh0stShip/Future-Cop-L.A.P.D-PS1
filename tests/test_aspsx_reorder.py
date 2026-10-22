@@ -9,6 +9,7 @@ from tools.verify_matching_units import (
     move_aspsx_load_delay_label,
     normalize_aspsx_indexed_byte_access,
     normalize_aspsx_line_packet,
+    normalize_aspsx_context_wrapper,
     normalize_aspsx_packet_cursor,
     reorder_aspsx_argument_save_groups,
     reorder_aspsx_vector_copy_call_setup,
@@ -24,6 +25,32 @@ from tools.verify_matching_units import (
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_normalizes_context_wrapper_schedule(self):
+        source = (
+            "lw\t$8,40($sp)\n"
+            "#nop # load delay\n"
+            "lw\t$3,44($sp)\n"
+            "#nop # load delay\n"
+            "li\t$2,0x00000001 # one\n"
+            "sw\t$31,16($sp)\n"
+            "sb\t$2,%gp_rel(D_flag)($gp)\n"
+            "sw\t$7,%gp_rel(D_context)($gp)\n"
+            "lw\t$2,0($8)\n"
+            "#nop # load delay\n"
+            "sra\t$3,$3,4\n"
+            "sh\t$3,%gp_rel(D_height)($gp)\n"
+            "lw\t$3,8($8)\n"
+            "#nop # load delay\n"
+            "sra\t$2,$2,4\n"
+            "sra\t$3,$3,4\n"
+            "sh\t$2,%gp_rel(D_x)($gp)\n"
+            "sh\t$3,%gp_rel(D_z)($gp)\n"
+        )
+        result = normalize_aspsx_context_wrapper(source)
+        self.assertIn("lw\t$2,44($sp)\nsw\t$31,16($sp)", result)
+        self.assertIn("sh\t$2,%gp_rel(D_height)($gp)", result)
+        self.assertIn("li\t$2,0x00000001\nsb\t$2,%gp_rel(D_flag)($gp)", result)
+
     def test_normalizes_line_packet_cursor_and_coordinates(self):
         source = (
             "lui\t$3,%hi(D_current) # high\n"

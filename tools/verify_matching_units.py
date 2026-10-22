@@ -689,6 +689,51 @@ def normalize_aspsx_line_packet(text):
     return text
 
 
+def normalize_aspsx_context_wrapper(text):
+    """Restore retail scheduling for a context-setting call wrapper."""
+    pattern = re.compile(
+        r"lw\t\$8,40\(\$sp\)\n"
+        r"#nop[^\n]*\n"
+        r"lw\t\$3,44\(\$sp\)\n"
+        r"#nop[^\n]*\n"
+        r"li\t\$2,0x00000001[^\n]*\n"
+        r"sw\t\$31,16\(\$sp\)\n"
+        r"sb\t\$2,%gp_rel\(([^)]+)\)\(\$gp\)\n"
+        r"sw\t\$7,%gp_rel\(([^)]+)\)\(\$gp\)\n"
+        r"lw\t\$2,0\(\$8\)\n"
+        r"#nop[^\n]*\n"
+        r"sra\t\$3,\$3,4\n"
+        r"sh\t\$3,%gp_rel\(([^)]+)\)\(\$gp\)\n"
+        r"lw\t\$3,8\(\$8\)\n"
+        r"#nop[^\n]*\n"
+        r"sra\t\$2,\$2,4\n"
+        r"sra\t\$3,\$3,4\n"
+        r"sh\t\$2,%gp_rel\(([^)]+)\)\(\$gp\)\n"
+        r"sh\t\$3,%gp_rel\(([^)]+)\)\(\$gp\)\n"
+    )
+    match = pattern.search(text)
+    if match is None:
+        raise ValueError("ASPSX context-wrapper pattern not found")
+    flag, context, height, x_value, z_value = match.groups()
+    replacement = (
+        "lw\t$8,40($sp)\n"
+        "lw\t$2,44($sp)\n"
+        "sw\t$31,16($sp)\n"
+        "lw\t$3,0($8)\n"
+        "sra\t$2,$2,4\n"
+        f"sh\t$2,%gp_rel({height})($gp)\n"
+        "sra\t$3,$3,4\n"
+        f"sh\t$3,%gp_rel({x_value})($gp)\n"
+        "lw\t$3,8($8)\n"
+        "li\t$2,0x00000001\n"
+        f"sb\t$2,%gp_rel({flag})($gp)\n"
+        f"sw\t$7,%gp_rel({context})($gp)\n"
+        "sra\t$3,$3,4\n"
+        f"sh\t$3,%gp_rel({z_value})($gp)\n"
+    )
+    return text[:match.start()] + replacement + text[match.end():]
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -782,6 +827,10 @@ def validate(config):
         if not isinstance(unit.get("aspsx_line_packet", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_line_packet must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_context_wrapper", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_context_wrapper must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -902,6 +951,8 @@ def compile_unit(unit, config, prefix, work, environment=None):
         processed.write_text(normalize_aspsx_packet_cursor(processed.read_text()))
     if unit.get("aspsx_line_packet", False):
         processed.write_text(normalize_aspsx_line_packet(processed.read_text()))
+    if unit.get("aspsx_context_wrapper", False):
+        processed.write_text(normalize_aspsx_context_wrapper(processed.read_text()))
     if marker_lines:
         marker_names = set(small_data_symbols)
         processed.write_text("\n".join(
