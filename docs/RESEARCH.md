@@ -123,6 +123,25 @@ tracks combination storage, and rejects command buffers larger than 128 bytes.
 The associated actuator-information dispatcher at `0x8008B168` and six-byte
 actuator-map builder at `0x8008B508` add a further 368 exact bytes under the
 2.7.2 compiler lane.
+
+## PsyQ object signatures
+
+`tools/scan_psyq_signatures.py` scans a PS-X EXE against the masked full-object
+patterns in `lab313ru/psx_psyq_signatures`, revision
+`e9e46e7e133ef275a79bfce650924f98edb086bc`. It accepts only objects with one
+complete payload match, ignores placeholder labels, and proposes names only at
+preserved function starts. Catalogue hashes are included in its JSON output.
+This is deliberately stricter than matching short function byte strings,
+which collide frequently among kernel stubs and SDK wrappers.
+
+A scan across all available catalogue versions found 1,407 unique
+version/object matches and 209 named function-start proposals. Of those, 199
+have a single name across every matching provider. The results identify the
+upper executable as contiguous LIBPAD, LIBAPI/LIBC, LIBCARD, LIBCD, LIBETC,
+LIBGPU, LIBGTE, LIBPRESS, and LIBSPU code, while preserving version ambiguity
+where different catalogues contain identical objects. These names are
+attribution evidence and a reconstruction work queue; they do not count as
+matching C by themselves.
 The intervening 212-byte initializer at `0x8008B094` is `_padLoadActInfo`; it
 lays out the mode, capability, and combination tables within a caller-provided
 buffer and installs the two command-processing callbacks.
