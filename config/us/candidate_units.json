@@ -25,6 +25,21 @@
       }
     },
     {
+      "name": "func_800210D0",
+      "address": "0x800210D0",
+      "size": "0x12C",
+      "source": "src/game/800210D0.c",
+      "symbols": {
+        "D_8009AB0C": "0x8009AB0C",
+        "D_8009AB18": "0x8009AB18"
+      },
+      "link": true,
+      "linker_symbols": {
+        "D_8009AB0C": "0x8009AB0C",
+        "D_8009AB18": "0x8009AB18"
+      }
+    },
+    {
       "name": "func_8002A5B4",
       "address": "0x8002A5B4",
       "size": "0x40",
