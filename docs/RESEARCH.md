@@ -92,3 +92,6 @@ load-information routines at `0x8008AE8C` and `0x8008AF10`. Their reconstructed
 C contributes another 464 exact bytes. The dispatcher selects command emitters
 from `sequence_step`; the response decoder fills mode and actuator metadata,
 tracks combination storage, and rejects command buffers larger than 128 bytes.
+The associated actuator-information dispatcher at `0x8008B168` and six-byte
+actuator-map builder at `0x8008B508` add a further 368 exact bytes under the
+2.7.2 compiler lane.
