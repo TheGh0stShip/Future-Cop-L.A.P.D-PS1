@@ -102,3 +102,5 @@ Its 628-byte response processor at `0x8008B210` reconstructs mode-table rows,
 five-byte actuator capability records, and variable-length combination data.
 It matches under GCC 2.7.2 and confirms `D_800A3B80` as the active combination
 payload cursor.
+The 104-byte `_padSetActAlign` routine at `0x8008B484` completes the path that
+installs the actuator command emitter and six-byte map response handler.
