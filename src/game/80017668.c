@@ -4,9 +4,14 @@ struct ModelTable {
     s32 count;
 };
 
+struct ModelVertex {
+    u8 unk00[4];
+    u8 position[4];
+};
+
 struct ModelAnim {
     s32 count;
-    u8 *frames[1];
+    struct ModelVertex *frames[1];
 };
 
 struct Model {
@@ -33,16 +38,24 @@ void func_80017668(struct ModelInstance *instance, s32 part, s32 *out)
 {
     struct Model *model;
     u8 *vertices;
-    u32 index;
+    register struct ModelAnim *frame __asm__("$2");
+    register u32 index __asm__("$16");
 
     model = instance->model;
     if ((model->flags >> 25) & 1) {
-        vertices = (u8 *)(model->table + 1) + instance->frame * model->table->count * 8;
+        vertices = (u8 *)(model->table + 1);
+        vertices += instance->frame * model->table->count * 8;
         func_80010750(instance->coord);
         func_80010234(vertices + part * 8, out, 1);
     } else {
         index = model->parts[part];
         func_80010750(instance->coord);
-        func_80010234(model->anim->frames[instance->frame] + index * 8 + 4, out, 1);
+        frame = (struct ModelAnim *)((u32)(instance->frame * 4) +
+                                     (u32)model->anim);
+        __asm__("" : : "r"(frame));
+        index *= 8;
+        __asm__("" : "=r"(index) : "0"(index));
+        index += 4;
+        func_80010234((u8 *)frame->frames[0] + index, out, 1);
     }
 }
