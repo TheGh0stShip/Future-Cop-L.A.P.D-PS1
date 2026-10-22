@@ -66,6 +66,16 @@ the current 129 candidates found no exact unit and no output improvement over
 2.8.1, so 2.8.0 remains available for later original-object attribution but is
 not selected by any current matching unit.
 
+A separate full-candidate sweep identified Cygnus GCC 2.7.2-970404 as a
+distinct and necessary lane. It is distributed as `gcc-2.7.2-cdk.tar.gz` in
+the pinned `decompals/old-gcc` release and is not interchangeable with the
+stock GCC 2.7.2 PSX build. Rebuilding every outstanding candidate with this
+lane produced 45 new byte-identical functions totaling 5,756 bytes. These
+matches include earlier one- and two-instruction near misses, confirming that
+their register allocation, shared returns, and scheduling differences came
+from compiler provenance rather than incorrect game logic. The bootstrap and
+compiler-sweep tools pin and test this lane directly.
+
 An audited reconstruction sweep of the `0x80040000..0x8005FFFF` and
 `0x80070000..0x8008FFFF` regions produced 116 additional matching C functions
 totaling 10,200 bytes. Every unit was rebuilt with the pinned compiler and

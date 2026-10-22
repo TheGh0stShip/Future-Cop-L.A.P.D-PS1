@@ -20,6 +20,7 @@ LOAD_ADDRESS = 0x80010000
 DEFAULT_COMPILERS = (
     "gcc-2.8.1-psx",
     "gcc-2.8.0-psx",
+    "gcc-2.7.2-cdk",
     "gcc-2.7.2-psx",
 )
 

@@ -17,6 +17,7 @@
     {"address": "0x8004DE80", "size": "0x60", "remove_starts": ["0x8004DE88"]},
     {"address": "0x8005A220", "size": "0x70", "remove_starts": ["0x8005A224"]},
     {"address": "0x800734BC", "size": "0x44", "remove_starts": ["0x800734C0"]},
-    {"address": "0x8007852C", "size": "0xCC", "remove_starts": ["0x80078530"]}
+    {"address": "0x8007852C", "size": "0xCC", "remove_starts": ["0x80078530"]},
+    {"address": "0x80048F3C", "size": "0x5C", "remove_starts": ["0x80048F40"]}
   ]
 }
