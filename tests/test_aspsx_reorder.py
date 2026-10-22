@@ -1,6 +1,7 @@
 import unittest
 
 from tools.verify_matching_units import (
+    defer_aspsx_column_mask,
     defer_aspsx_saved_call_argument,
     expand_aspsx_indexed_return_store,
     hoist_aspsx_indexed_address,
@@ -25,6 +26,23 @@ from tools.verify_matching_units import (
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_defers_column_mask_until_after_row_base(self):
+        source = (
+            "andi\t$5,$5,0x00ff\n"
+            "lui\t$2,%hi(D_grid) # high\n"
+            "addiu\t$2,$2,%lo(D_grid) # low\n"
+            "sll\t$6,$6,10\n"
+            "addu\t$2,$6,$2\n"
+        )
+        expected = (
+            "lui\t$2,%hi(D_grid)\n"
+            "addiu\t$2,$2,%lo(D_grid)\n"
+            "sll\t$6,$6,10\n"
+            "addu\t$2,$6,$2\n"
+            "andi\t$5,$5,0x00ff\n"
+        )
+        self.assertEqual(defer_aspsx_column_mask(source), expected)
+
     def test_normalizes_context_wrapper_schedule(self):
         source = (
             "lw\t$8,40($sp)\n"

@@ -352,6 +352,23 @@
       "symbols": {}
     },
     {
+      "name": "func_8003B3F8",
+      "address": "0x8003B3F8",
+      "size": "0x54",
+      "source": "src/game/8003B3F8.c",
+      "compiler": "gcc-2.7.2-cdk",
+      "link": true,
+      "linker_symbols": {
+        "D_800A7040": "0x800A7040",
+        "D_800A6578": "0x800A6578"
+      },
+      "symbols": {
+        "D_800A7040": "0x800A7040",
+        "D_800A6578": "0x800A6578"
+      },
+      "aspsx_defer_column_mask": true
+    },
+    {
       "name": "func_8003B65C",
       "address": "0x8003B65C",
       "size": "0x48",

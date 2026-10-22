@@ -734,6 +734,29 @@ def normalize_aspsx_context_wrapper(text):
     return text[:match.start()] + replacement + text[match.end():]
 
 
+def defer_aspsx_column_mask(text):
+    """Move a byte-column mask after construction of its row base."""
+    pattern = re.compile(
+        r"andi\t\$5,\$5,0x00ff\n"
+        r"lui\t\$2,%hi\(([^)]+)\)[^\n]*\n"
+        r"addiu\t\$2,\$2,%lo\(\1\)[^\n]*\n"
+        r"sll\t\$6,\$6,10\n"
+        r"addu\t\$2,\$6,\$2\n"
+    )
+    match = pattern.search(text)
+    if match is None:
+        raise ValueError("ASPSX column-mask pattern not found")
+    symbol = match.group(1)
+    replacement = (
+        f"lui\t$2,%hi({symbol})\n"
+        f"addiu\t$2,$2,%lo({symbol})\n"
+        "sll\t$6,$6,10\n"
+        "addu\t$2,$6,$2\n"
+        "andi\t$5,$5,0x00ff\n"
+    )
+    return text[:match.start()] + replacement + text[match.end():]
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -831,6 +854,10 @@ def validate(config):
         if not isinstance(unit.get("aspsx_context_wrapper", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_context_wrapper must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_defer_column_mask", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_defer_column_mask must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -953,6 +980,8 @@ def compile_unit(unit, config, prefix, work, environment=None):
         processed.write_text(normalize_aspsx_line_packet(processed.read_text()))
     if unit.get("aspsx_context_wrapper", False):
         processed.write_text(normalize_aspsx_context_wrapper(processed.read_text()))
+    if unit.get("aspsx_defer_column_mask", False):
+        processed.write_text(defer_aspsx_column_mask(processed.read_text()))
     if marker_lines:
         marker_names = set(small_data_symbols)
         processed.write_text("\n".join(
