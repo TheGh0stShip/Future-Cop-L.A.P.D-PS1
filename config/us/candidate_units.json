@@ -98,15 +98,6 @@
       "symbols": {}
     },
     {
-      "name": "func_80069580",
-      "address": "0x80069580",
-      "size": "0x28",
-      "source": "src/game/80069580.c",
-      "symbols": {
-        "D_800A3190": "0x800A3190"
-      }
-    },
-    {
       "name": "func_8008C858",
       "address": "0x8008C858",
       "size": "0x2C",

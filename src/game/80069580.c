@@ -15,7 +15,10 @@ extern struct SourcePair D_800A3190[];
 
 void func_80069580(u32 index, struct DestinationTriple *destination)
 {
+    s32 first;
+
+    first = D_800A3190[index].first;
     destination->zero = 0;
-    destination->first = D_800A3190[index].first;
+    destination->first = first;
     destination->second = D_800A3190[index].second;
 }
