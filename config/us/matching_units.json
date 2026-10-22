@@ -14,6 +14,14 @@
   ],
   "units": [
     {
+      "name": "func_8001B148",
+      "address": "0x8001B148",
+      "size": "0x180",
+      "source": "src/game/8001B148.c",
+      "compiler": "gcc-2.7.2-cdk",
+      "symbols": {}
+    },
+    {
       "name": "func_8001AF84",
       "address": "0x8001AF84",
       "size": "0x1C4",
