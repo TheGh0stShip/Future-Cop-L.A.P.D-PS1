@@ -6,6 +6,7 @@ from tools.verify_matching_units import (
     move_aspsx_load_delay_label,
     reorder_aspsx_argument_save_groups,
     reorder_aspsx_vector_copy_call_setup,
+    reuse_aspsx_initialized_zero,
     reuse_aspsx_symbolic_load_destination,
     reorder_aspsx_return_delay_slot,
     reorder_aspsx_jump_store_delay_slot,
@@ -13,6 +14,15 @@ from tools.verify_matching_units import (
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_reuses_initialized_zero_value(self):
+        source = (
+            "addu\t$2,$0,$zero\nlb\t$3,160($5)\nnop\n"
+            "bne\t$3,$0,$L2\nli\t$7,0x00000001\t\t# 1\n"
+            "j\t$L3\naddu\t$7,$0,$zero\n$L2:\n"
+        )
+        expected = source.replace("addu\t$7,$0,$zero", "addu\t$7,$2,$zero")
+        self.assertEqual(reuse_aspsx_initialized_zero(source), expected)
+
     def test_reorders_vector_copy_call_setup(self):
         source = (
             "lw\t$2,D_camera\n# load delay\nlw\t$3,0($5)\n"

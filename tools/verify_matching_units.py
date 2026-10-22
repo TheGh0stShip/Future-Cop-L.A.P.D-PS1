@@ -291,6 +291,33 @@ def reorder_aspsx_vector_copy_call_setup(text):
     raise ValueError("ASPSX vector-copy call-setup pattern not found")
 
 
+def reuse_aspsx_initialized_zero(text):
+    """Use an initialized zero-valued register instead of the hardware zero."""
+    lines = text.splitlines()
+    meaningful = [
+        index for index, line in enumerate(lines)
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    for offset in range(len(meaningful) - 6):
+        indices = meaningful[offset:offset + 7]
+        block = [lines[index].strip() for index in indices]
+        if block[0] != "addu\t$2,$0,$zero":
+            continue
+        if block[1] != "lb\t$3,160($5)" or not block[2].startswith("nop"):
+            continue
+        if not re.fullmatch(r"bne\s+\$3,\$0,\$L\d+", block[3]):
+            continue
+        if not re.fullmatch(r"li\s+\$7,0x00000001(?:\s+# 1)?", block[4]):
+            continue
+        if not re.fullmatch(r"j\s+\$L\d+", block[5]):
+            continue
+        if block[6] != "addu\t$7,$0,$zero":
+            continue
+        lines[indices[6]] = "addu\t$7,$2,$zero"
+        return "\n".join(lines) + "\n"
+    raise ValueError("ASPSX initialized-zero reuse pattern not found")
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -340,6 +367,10 @@ def validate(config):
         if not isinstance(unit.get("aspsx_reorder_vector_copy_call", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_reorder_vector_copy_call must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_reuse_zero_value", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_reuse_zero_value must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -423,6 +454,10 @@ def compile_unit(unit, config, prefix, work, environment=None):
     if unit.get("aspsx_reorder_vector_copy_call", False):
         processed.write_text(
             reorder_aspsx_vector_copy_call_setup(processed.read_text())
+        )
+    if unit.get("aspsx_reuse_zero_value", False):
+        processed.write_text(
+            reuse_aspsx_initialized_zero(processed.read_text())
         )
     if marker_lines:
         marker_names = set(small_data_symbols)
