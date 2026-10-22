@@ -61,14 +61,14 @@ def reorder_aspsx_return_delay_slot(text):
     raise ValueError("ASPSX return-delay-slot pattern not found")
 
 
-def reorder_aspsx_return_store_delay_slot(text):
-    """Reproduce ASPSX's safe terminal-store return delay fill."""
+def reorder_aspsx_jump_store_delay_slot(text):
+    """Reproduce ASPSX's symbolic-store fill for a direct jump or call."""
     lines = text.splitlines()
     for index in range(len(lines) - 2):
         store = re.fullmatch(r"\s*sw\s+(\$[0-9]+),([^\s]+)\s*", lines[index])
-        return_jump = re.fullmatch(r"\s*j\s+\$31\s*", lines[index + 1])
+        jump = re.fullmatch(r"\s*(?:j|jal)\s+(?:\$31|\$L[0-9A-Za-z_]+|[A-Za-z_][A-Za-z0-9_]*)\s*", lines[index + 1])
         delay_nop = re.fullmatch(r"\s*nop(?:\s+#.*)?\s*", lines[index + 2])
-        if store and return_jump and delay_nop:
+        if store and jump and delay_nop:
             register, destination = store.groups()
             if "(" not in destination:
                 lines[index:index + 3] = [
@@ -81,7 +81,7 @@ def reorder_aspsx_return_store_delay_slot(text):
             else:
                 lines[index:index + 3] = [lines[index + 1], lines[index]]
             return "\n".join(lines) + "\n"
-    raise ValueError("ASPSX return-store-delay-slot pattern not found")
+    raise ValueError("ASPSX jump-store-delay-slot pattern not found")
 
 
 def move_aspsx_load_delay_label(text):
@@ -126,9 +126,9 @@ def validate(config):
             raise ValueError(
                 f"{unit['name']}: aspsx_move_load_delay_label must be boolean"
             )
-        if not isinstance(unit.get("aspsx_reorder_return_store", False), bool):
+        if not isinstance(unit.get("aspsx_reorder_jump_store", False), bool):
             raise ValueError(
-                f"{unit['name']}: aspsx_reorder_return_store must be boolean"
+                f"{unit['name']}: aspsx_reorder_jump_store must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -189,9 +189,9 @@ def compile_unit(unit, config, prefix, work, environment=None):
         processed.write_text(reorder_aspsx_return_delay_slot(processed.read_text()))
     if unit.get("aspsx_move_load_delay_label", False):
         processed.write_text(move_aspsx_load_delay_label(processed.read_text()))
-    if unit.get("aspsx_reorder_return_store", False):
+    if unit.get("aspsx_reorder_jump_store", False):
         processed.write_text(
-            reorder_aspsx_return_store_delay_slot(processed.read_text())
+            reorder_aspsx_jump_store_delay_slot(processed.read_text())
         )
     if marker_lines:
         marker_names = set(small_data_symbols)

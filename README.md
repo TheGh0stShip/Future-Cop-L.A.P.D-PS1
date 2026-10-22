@@ -1,7 +1,7 @@
 # Future Cop: L.A.P.D. (USA) matching decompilation
 
-[![Code](https://img.shields.io/badge/code-24448%2F555552-red)](https://bytematch.dev/TheGh0stShip/Future-Cop-L.A.P.D-PS1)
-[![Functions](https://img.shields.io/badge/functions-314%2F1869-red)](https://bytematch.dev/TheGh0stShip/Future-Cop-L.A.P.D-PS1)
+[![Code](https://img.shields.io/badge/code-24572%2F555552-red)](https://bytematch.dev/TheGh0stShip/Future-Cop-L.A.P.D-PS1)
+[![Functions](https://img.shields.io/badge/functions-316%2F1869-red)](https://bytematch.dev/TheGh0stShip/Future-Cop-L.A.P.D-PS1)
 [![Verify](https://github.com/TheGh0stShip/Future-Cop-L.A.P.D-PS1/actions/workflows/verify.yml/badge.svg)](https://github.com/TheGh0stShip/Future-Cop-L.A.P.D-PS1/actions/workflows/verify.yml)
 
 An in-progress, byte-matching C reconstruction of the North American
@@ -14,7 +14,7 @@ repository.
 The current scaffold verifies the exact USA executable, extracts the disc,
 splits 100% of the executable with Splat, inventories provisional function
 starts, pins the PSX compiler toolchain, and compares reviewed C units directly
-to retail bytes. 314 functions totaling 24,448 bytes currently match. Provisional assembly,
+to retail bytes. 316 functions totaling 24,572 bytes currently match. Provisional assembly,
 generated static-recompiler output, and boundary guesses do not count as
 matching C.
 

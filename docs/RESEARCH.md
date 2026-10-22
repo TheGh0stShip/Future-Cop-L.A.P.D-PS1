@@ -203,3 +203,7 @@ ASPSX also splits a terminal symbolic store, retaining its `lui` before
 `jr $ra` while placing the low-half `sw` in the delay slot. Reproducing that
 opt-in transformation makes the 48-byte LIBSPU state setter at `0x80098F48`
 an exact GCC 2.6.3 match.
+Generalizing the same rule to direct jumps and calls also resolves the adjacent
+64-byte transfer-mode getter and 60-byte IRQ callback setter. The callback
+setter additionally uses the proven stack-pop return fill; both retain their
+source-level SDK behavior unchanged.
