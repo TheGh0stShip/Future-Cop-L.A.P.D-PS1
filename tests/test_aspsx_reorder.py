@@ -3,12 +3,28 @@ import unittest
 from tools.verify_matching_units import (
     move_aspsx_load_delay_label,
     reorder_aspsx_argument_save_groups,
+    reuse_aspsx_symbolic_load_destination,
     reorder_aspsx_return_delay_slot,
     reorder_aspsx_jump_store_delay_slot,
 )
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_reuses_symbolic_load_destination_when_scratch_dies(self):
+        source = "lw\t$3,value\n#nop # DEBUG: independent instruction\nli\t$2,2\n"
+        expected = (
+            "lui\t$3,%hi(value)\n"
+            "lw\t$3,%lo(value)($3)\n"
+            "#nop # DEBUG: independent instruction\n"
+            "li\t$2,2\n"
+        )
+        self.assertEqual(reuse_aspsx_symbolic_load_destination(source), expected)
+
+    def test_keeps_live_symbolic_load_scratch(self):
+        source = "lui\t$2,%hi(value)\nlw\t$3,%lo(value)($2)\naddu\t$4,$2,$zero\n"
+        with self.assertRaisesRegex(ValueError, "pattern not found"):
+            reuse_aspsx_symbolic_load_destination(source)
+
     def test_orders_adjacent_argument_save_groups(self):
         source = (
             "sw\t$20,32($sp)\n"

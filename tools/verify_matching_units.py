@@ -127,6 +127,56 @@ def reorder_aspsx_argument_save_groups(text):
     raise ValueError("ASPSX argument-save-group pattern not found")
 
 
+def reuse_aspsx_symbolic_load_destination(text):
+    """Use the load destination for a symbolic address when the scratch dies."""
+    lines = text.splitlines()
+    high = re.compile(
+        r"\s*lui\s+\$(\d+),%hi\(([^)]+)\)(?:\s+#.*)?\s*"
+    )
+    load = re.compile(
+        r"\s*(l[whbu]+)\s+\$(\d+),%lo\(([^)]+)\)\(\$(\d+)\)"
+        r"(?:\s+#.*)?\s*"
+    )
+    symbolic_load = re.compile(
+        r"\s*(l[whbu]+)\s+\$(\d+),([A-Za-z_][A-Za-z0-9_]*)\s*"
+    )
+    overwrite = re.compile(r"\s*(?:li|lui|addu|addiu|ori)\s+\$(\d+)(?:,|\s).*")
+    for index in range(len(lines) - 2):
+        symbolic_match = symbolic_load.fullmatch(lines[index])
+        if symbolic_match:
+            opcode, destination, symbol = symbolic_match.groups()
+            lines[index:index + 1] = [
+                f"lui\t${destination},%hi({symbol})",
+                f"{opcode}\t${destination},%lo({symbol})(${destination})",
+            ]
+            return "\n".join(lines) + "\n"
+        high_match = high.fullmatch(lines[index])
+        load_match = load.fullmatch(lines[index + 1])
+        next_index = index + 2
+        while next_index < len(lines) and (
+            not lines[next_index].strip()
+            or lines[next_index].lstrip().startswith("#")
+        ):
+            next_index += 1
+        overwrite_match = (
+            overwrite.fullmatch(lines[next_index]) if next_index < len(lines) else None
+        )
+        if not all((high_match, load_match, overwrite_match)):
+            continue
+        scratch, symbol = high_match.groups()
+        opcode, destination, load_symbol, base = load_match.groups()
+        if symbol != load_symbol or scratch != base or scratch == destination:
+            continue
+        if overwrite_match.group(1) != scratch:
+            continue
+        lines[index] = f"lui\t${destination},%hi({symbol})"
+        lines[index + 1] = (
+            f"{opcode}\t${destination},%lo({symbol})(${destination})"
+        )
+        return "\n".join(lines) + "\n"
+    raise ValueError("ASPSX symbolic-load-destination pattern not found")
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -160,6 +210,10 @@ def validate(config):
         if not isinstance(unit.get("aspsx_reorder_argument_saves", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_reorder_argument_saves must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_reuse_load_destination", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_reuse_load_destination must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -227,6 +281,10 @@ def compile_unit(unit, config, prefix, work, environment=None):
     if unit.get("aspsx_reorder_argument_saves", False):
         processed.write_text(
             reorder_aspsx_argument_save_groups(processed.read_text())
+        )
+    if unit.get("aspsx_reuse_load_destination", False):
+        processed.write_text(
+            reuse_aspsx_symbolic_load_destination(processed.read_text())
         )
     if marker_lines:
         marker_names = set(small_data_symbols)

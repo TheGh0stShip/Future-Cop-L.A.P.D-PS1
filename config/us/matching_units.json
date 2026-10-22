@@ -8010,6 +8010,19 @@
       "link": true,
       "linker_symbols": {"func_80010234": "0x80010234", "func_80010750": "0x80010750", "func_80052960": "0x80052960"},
       "symbols": {"func_80010234": "0x80010234", "func_80010750": "0x80010750", "func_80052960": "0x80052960"}
+    },
+    {
+      "name": "func_80053730",
+      "address": "0x80053730",
+      "size": "0xA0",
+      "source": "src/game/80053730.c",
+      "compiler": "gcc-2.7.2-cdk",
+      "compiler_flags": ["-quiet", "-msoft-float", "-mgas", "-G4", "-fgnu-linker", "-O2"],
+      "aspsx_reuse_load_destination": true,
+      "small_data_symbols": {"D_8009FA64": 4},
+      "link": true,
+      "linker_symbols": {"D_8009FA0C": "0x8009FA0C", "D_8009FA58": "0x8009FA58", "D_8009FA64": "0x8009FA64", "D_8009FA94": "0x8009FA94", "func_8001A074": "0x8001A074", "_gp": "0x8009F214"},
+      "symbols": {"D_8009FA0C": "0x8009FA0C", "D_8009FA58": "0x8009FA58", "D_8009FA64": "0x8009FA64", "D_8009FA94": "0x8009FA94", "func_8001A074": "0x8001A074"}
     }
   ]
 }
