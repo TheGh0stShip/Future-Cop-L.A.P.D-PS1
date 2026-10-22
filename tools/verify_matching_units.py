@@ -173,7 +173,9 @@ def reuse_aspsx_symbolic_load_destination(text):
     address = re.compile(
         r"\s*addiu\s+\$(\d+),\$(\d+),%lo\(([^)]+)\)(?:\s+#.*)?\s*"
     )
-    overwrite = re.compile(r"\s*(?:li|lui|addu|addiu|ori)\s+\$(\d+)(?:,|\s).*")
+    overwrite = re.compile(
+        r"\s*(?:li|lui|addu|addiu|ori|l[whbu]+)\s+\$(\d+)(?:,|\s).*"
+    )
     for index in range(len(lines) - 2):
         symbolic_match = symbolic_load.fullmatch(lines[index])
         if symbolic_match:
@@ -199,6 +201,7 @@ def reuse_aspsx_symbolic_load_destination(text):
         while next_index < len(lines) and (
             not lines[next_index].strip()
             or lines[next_index].lstrip().startswith("#")
+            or re.fullmatch(r"\s*nop\s+# DEBUG:.*", lines[next_index])
         ):
             next_index += 1
         overwrite_match = (

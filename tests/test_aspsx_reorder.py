@@ -53,6 +53,21 @@ class AspsxReorderTests(unittest.TestCase):
         )
         self.assertEqual(reuse_aspsx_symbolic_load_destination(source), expected)
 
+    def test_reuses_symbolic_load_destination_before_scratch_reload(self):
+        source = (
+            "lui\t$2,%hi(value)\n"
+            "lw\t$3,%lo(value)($2)\n"
+            "nop # DEBUG: load delay\n"
+            "lw\t$2,12($3)\n"
+        )
+        expected = (
+            "lui\t$3,%hi(value)\n"
+            "lw\t$3,%lo(value)($3)\n"
+            "nop # DEBUG: load delay\n"
+            "lw\t$2,12($3)\n"
+        )
+        self.assertEqual(reuse_aspsx_symbolic_load_destination(source), expected)
+
     def test_keeps_live_symbolic_load_scratch(self):
         source = "lui\t$2,%hi(value)\nlw\t$3,%lo(value)($2)\naddu\t$4,$2,$zero\n"
         with self.assertRaisesRegex(ValueError, "pattern not found"):

@@ -36,10 +36,10 @@ void func_80078210(void)
         }
         D_800A377D[0] = 1;
     } else {
-        D_8009F8E0 = 0;
-        D_8009F8E4 = 0;
-        D_800A377D[0] = 0;
-        if (D_8009FA94[0]->split == 1) {
+        *(volatile s32 *)&D_8009F8E0 = 0;
+        *(volatile s32 *)&D_8009F8E4 = 0;
+        *(volatile u8 *)&D_800A377D[0] = 0;
+        if (((volatile struct Unk78210Mode *)D_8009FA94[0])->split == 1) {
             func_80078650(&D_800A3898, 0);
         } else {
             func_80078650(&D_800A3868, 0);
