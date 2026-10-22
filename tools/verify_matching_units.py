@@ -464,6 +464,19 @@ def expand_aspsx_indexed_return_store(text):
     raise ValueError("ASPSX indexed return-store pattern not found")
 
 
+def hoist_aspsx_indexed_address(text):
+    """Materialize a symbolic base before calculating its array index."""
+    lines = text.splitlines()
+    shift = re.compile(r"\s*sll\s+\$(\d+),\$(\d+),(\d+)\s*")
+    address = re.compile(r"\s*la\s+\$(\d+),([A-Za-z_][A-Za-z0-9_]*)\s*")
+    for index in range(len(lines) - 1):
+        if not shift.fullmatch(lines[index]) or not address.fullmatch(lines[index + 1]):
+            continue
+        lines[index], lines[index + 1] = lines[index + 1], lines[index]
+        return "\n".join(lines) + "\n"
+    raise ValueError("ASPSX indexed-address pattern not found")
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -537,6 +550,10 @@ def validate(config):
         if not isinstance(unit.get("aspsx_expand_indexed_return_store", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_expand_indexed_return_store must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_hoist_indexed_address", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_hoist_indexed_address must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -643,6 +660,8 @@ def compile_unit(unit, config, prefix, work, environment=None):
         processed.write_text(
             expand_aspsx_indexed_return_store(processed.read_text())
         )
+    if unit.get("aspsx_hoist_indexed_address", False):
+        processed.write_text(hoist_aspsx_indexed_address(processed.read_text()))
     if marker_lines:
         marker_names = set(small_data_symbols)
         processed.write_text("\n".join(

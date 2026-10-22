@@ -3,6 +3,7 @@ import unittest
 from tools.verify_matching_units import (
     defer_aspsx_saved_call_argument,
     expand_aspsx_indexed_return_store,
+    hoist_aspsx_indexed_address,
     fill_aspsx_symbolic_load_delay_slot,
     hoist_aspsx_small_data_load_before_prologue,
     move_aspsx_load_delay_label,
@@ -19,6 +20,11 @@ from tools.verify_matching_units import (
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_hoists_symbolic_base_before_array_index(self):
+        source = "sll\t$3,$3,3\nla\t$2,D_table\naddu\t$3,$3,$2\n"
+        expected = "la\t$2,D_table\nsll\t$3,$3,3\naddu\t$3,$3,$2\n"
+        self.assertEqual(hoist_aspsx_indexed_address(source), expected)
+
     def test_expands_indexed_store_into_return_slot(self):
         source = (
             "sll\t$2,$7,4\n"
