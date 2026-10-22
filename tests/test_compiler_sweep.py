@@ -1,6 +1,10 @@
+import json
+import tempfile
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
-from tools.sweep_candidate_compilers import compare, score
+from tools.sweep_candidate_compilers import compare, score, sweep
 
 
 class CompilerSweepTests(unittest.TestCase):
@@ -22,6 +26,38 @@ class CompilerSweepTests(unittest.TestCase):
         better = compare(b"abcdefgh", b"abcdxfgh")
         worse = compare(b"abcdefgh", b"abxxxxxx")
         self.assertGreater(score(better), score(worse))
+
+    def test_sweep_can_select_one_named_unit(self):
+        config = {
+            "compiler": "unused",
+            "compiler_flags": [],
+            "maspsx_flags": [],
+            "units": [
+                {"name": "first", "address": "0x80010000", "size": "0x4",
+                 "source": "first.c", "symbols": {}},
+                {"name": "second", "address": "0x80010004", "size": "0x4",
+                 "source": "second.c", "symbols": {}},
+            ],
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            config_path = root / "units.json"
+            executable_path = root / "game.exe"
+            config_path.write_text(json.dumps(config))
+            executable_path.write_bytes(bytes(0x808))
+            with patch(
+                "tools.sweep_candidate_compilers.verifier.validate"
+            ), patch(
+                "tools.sweep_candidate_compilers.verifier.compile_unit",
+                return_value=bytes(4),
+            ) as compile_unit:
+                report = sweep(
+                    config_path, executable_path, ["test-compiler"], "unused-",
+                    {"second"},
+                )
+        self.assertEqual(report["candidate_functions"], 1)
+        self.assertEqual(report["units"][0]["name"], "second")
+        self.assertTrue(compile_unit.call_args.args[0]["link"])
 
 
 if __name__ == "__main__":

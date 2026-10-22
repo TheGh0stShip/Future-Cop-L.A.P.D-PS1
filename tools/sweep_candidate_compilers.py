@@ -68,9 +68,17 @@ def score(result: dict) -> tuple[int, int, int, int]:
 
 
 def sweep(config_path: Path, executable_path: Path, compilers: list[str],
-          prefix: str) -> dict:
+          prefix: str, unit_names: set[str] | None = None) -> dict:
     config = json.loads(config_path.read_text())
     verifier.validate(config)
+    if unit_names:
+        available = {unit["name"] for unit in config["units"]}
+        missing = sorted(unit_names - available)
+        if missing:
+            raise ValueError("unknown candidate unit(s): " + ", ".join(missing))
+        config["units"] = [
+            unit for unit in config["units"] if unit["name"] in unit_names
+        ]
     executable = executable_path.read_bytes()
     units = []
     with tempfile.TemporaryDirectory(prefix="future-cop-sweep-") as directory:
@@ -135,6 +143,10 @@ def main() -> None:
     parser.add_argument("--output", type=Path,
                         default=ROOT / "build/us/compiler_sweep.json")
     parser.add_argument("--compiler", action="append", dest="compilers")
+    parser.add_argument(
+        "--unit", action="append", dest="units",
+        help="sweep only this candidate name; may be repeated",
+    )
     parser.add_argument("--binutils-prefix", default="mipsel-linux-gnu-")
     args = parser.parse_args()
     report = sweep(
@@ -142,6 +154,7 @@ def main() -> None:
         args.executable,
         args.compilers or list(DEFAULT_COMPILERS),
         args.binutils_prefix,
+        set(args.units) if args.units else None,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")

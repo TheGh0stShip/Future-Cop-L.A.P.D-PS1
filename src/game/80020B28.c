@@ -9,7 +9,7 @@ struct TableRecord {
 
 void func_80020B28(struct TableRecord *records)
 {
-    int index;
+    u32 index;
 
     for (index = 0x10; index < 0x24; index++) {
         records[index].bytes[0] = 0xFF;
