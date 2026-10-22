@@ -5,6 +5,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -47,6 +48,19 @@ def tool_environment(environment=None):
     return result
 
 
+def reorder_aspsx_return_delay_slot(text):
+    """Reproduce ASPSX's safe stack-pop fill for a terminal return."""
+    lines = text.splitlines()
+    for index in range(len(lines) - 2):
+        stack_pop = re.fullmatch(r"\s*addu\s+\$sp,\$sp,(-?(?:0x)?[0-9a-fA-F]+)\s*", lines[index])
+        return_jump = re.fullmatch(r"\s*j\s+\$31\s*", lines[index + 1])
+        delay_nop = re.fullmatch(r"\s*nop(?:\s+#.*)?\s*", lines[index + 2])
+        if stack_pop and return_jump and delay_nop:
+            lines[index:index + 3] = [lines[index + 1], lines[index]]
+            return "\n".join(lines) + "\n"
+    raise ValueError("ASPSX return-delay-slot pattern not found")
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -65,6 +79,10 @@ def validate(config):
             raise ValueError(f"{unit['name']}: source does not exist")
         if not isinstance(unit.get("link", False), bool):
             raise ValueError(f"{unit['name']}: link must be boolean")
+        if not isinstance(unit.get("aspsx_reorder_epilogue", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_reorder_epilogue must be boolean"
+            )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
             if not isinstance(linker_symbols, dict):
@@ -120,6 +138,8 @@ def compile_unit(unit, config, prefix, work, environment=None):
     with processed.open("w") as output:
         run(["python3", maspsx, *maspsx_flags, maspsx_input],
             stdout=output, env=environment)
+    if unit.get("aspsx_reorder_epilogue", False):
+        processed.write_text(reorder_aspsx_return_delay_slot(processed.read_text()))
     if marker_lines:
         marker_names = set(small_data_symbols)
         processed.write_text("\n".join(

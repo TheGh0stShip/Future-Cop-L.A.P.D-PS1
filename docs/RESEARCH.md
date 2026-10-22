@@ -189,9 +189,10 @@ The 332-byte main-mode chain at `0x8008B5D0..0x8008B71B` reconstructs
 `_padSetMainMode`, its command emitter, and its completion handler. The setup
 uses GCC 2.8.1; both callbacks match the 2.7.2 scheduling lane.
 
-Four more LIBPRESS routines contribute 312 verified bytes. `DecDCTReset`
+Five more LIBPRESS routines contribute 464 verified bytes. `DecDCTReset`
 selects GCC 2.8.1, the 140-byte environment reader selects the PsyQ-flavoured
 GCC 2.7.2 lane, and both synchronization wrappers select the Cygnus 2.7.2
-lane. The adjacent 152-byte environment uploader remains a candidate: its
-best reconstruction matches 146 bytes but schedules the final stack restore
-outside the return delay slot.
+lane. The adjacent 152-byte environment uploader proves a separate Sony GCC
+2.6.3 `-O2` lane. Its compiler output is instruction-identical; the original
+ASPSX moves the terminal stack restore into the return delay slot, a safe
+reordering that the pinned MASPSX bridge now applies only when a unit opts in.

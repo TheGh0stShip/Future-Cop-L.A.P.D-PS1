@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 HEADER_SIZE = 0x800
 LOAD_ADDRESS = 0x80010000
 DEFAULT_COMPILERS = (
+    "gcc-2.6.3-psx",
     "gcc-2.8.1-psx",
     "gcc-2.8.0-psx",
     "gcc-2.7.2-cdk",

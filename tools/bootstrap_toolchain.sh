@@ -7,6 +7,9 @@ downloads="$dest/downloads"
 mkdir -p "$downloads"
 
 gcc_release=https://github.com/decompals/old-gcc/releases/download/0.13
+gcc_263_url=https://github.com/Xeeynamo/sotn-decomp/releases/download/cc1-psx-26/cc1-psx-26.tar.gz
+gcc_263_archive="$downloads/cc1-psx-26.tar.gz"
+gcc_263_sha=ab156fe598ccad6aef704b8b35f3272de7edaf7eaab4e3d504c346ce6647df6c
 
 maspsx_commit=423ffc6bca05e53f9b7ab06159d0cbe71111bc90
 maspsx_url="https://github.com/mkst/maspsx/archive/$maspsx_commit.zip"
@@ -17,8 +20,8 @@ binutils_url=https://archive.ubuntu.com/ubuntu/pool/universe/b/binutils-mipsen/$
 binutils_archive="$downloads/$binutils_name"
 binutils_sha=678275fa6abda0b7fabbc55ff6a09654701a6c2e86794c7a0b6e773e663e49db
 
-# Compiler selection is per original object. EA-era code is known to span the
-# 2.7.2, 2.8.0, and 2.8.1 PSX compiler releases.
+# Compiler selection is per original object. The executable spans Sony's 2.6.3
+# SDK compiler and the 2.7.2, 2.8.0, and 2.8.1 PSX compiler releases.
 for spec in \
     gcc-2.8.1-psx:51e94d84906d5ac1fa58cf66b7eed43e2c995526ef71df6ff5562df0177117e3 \
     gcc-2.8.0-psx:6e3aa53f117d9957feca444e9bbc9b5435b70624fd629a4dd306efdbe5d25f54 \
@@ -35,6 +38,15 @@ do
     mkdir -p "$dest/$name"
     tar -xzf "$archive" -C "$dest/$name"
 done
+
+if [ ! -f "$gcc_263_archive" ]; then
+    curl -L --fail --output "$gcc_263_archive" "$gcc_263_url"
+fi
+printf '%s  %s\n' "$gcc_263_sha" "$gcc_263_archive" | sha256sum -c -
+mkdir -p "$dest/gcc-2.6.3-psx"
+tar -xzf "$gcc_263_archive" -C "$dest/gcc-2.6.3-psx"
+mv "$dest/gcc-2.6.3-psx/cc1-psx-26" "$dest/gcc-2.6.3-psx/cc1"
+cp "$dest/gcc-2.7.2-psx/cpp" "$dest/gcc-2.6.3-psx/cpp"
 
 if [ ! -f "$maspsx_archive" ]; then
     curl -L --fail --output "$maspsx_archive" "$maspsx_url"
@@ -55,6 +67,7 @@ test -x "$dest/gcc-2.8.1-psx/cc1"
 test -x "$dest/gcc-2.8.0-psx/cc1"
 test -x "$dest/gcc-2.7.2-cdk/cc1"
 test -x "$dest/gcc-2.7.2-psx/cc1"
+test -x "$dest/gcc-2.6.3-psx/cc1"
 test -f "$dest/maspsx-$maspsx_commit/maspsx.py"
 test -x "$dest/mipsel-binutils/root/usr/bin/mipsel-linux-gnu-as" || \
     command -v mipsel-linux-gnu-as >/dev/null
