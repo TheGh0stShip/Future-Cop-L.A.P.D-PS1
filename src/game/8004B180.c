@@ -1,18 +1,20 @@
 #include "game/types.h"
 
-struct Unk4B180Shape {
-    u8 unk00[0x0C];
+struct Vec3s32 {
     s32 x;
     s32 y;
     s32 z;
+};
+
+struct Unk4B180Shape {
+    u8 unk00[0x0C];
+    struct Vec3s32 position;
     s16 radius;
 };
 
 struct Unk4B180Hit {
     s32 unk00;
-    s32 x;
-    s32 y;
-    s32 z;
+    struct Vec3s32 position;
     u8 unk10[0x30];
     s16 strength;
     u8 unk42[7];
@@ -38,6 +40,7 @@ extern s32 func_8003E984(void *owner, s32 arg1, u8 kind, struct Unk4B180Hit *hit
 void func_8004B180(struct Unk4B180 *object)
 {
     struct Unk4B180Hit hit;
+    struct Unk4B180Shape *shape;
     s32 length;
 
     if (object->shape->radius >= 0) {
@@ -47,12 +50,11 @@ void func_8004B180(struct Unk4B180 *object)
     if (object->kind == 0) {
         return;
     }
-    hit.x = object->shape->x;
-    hit.y = object->shape->y;
-    hit.z = object->shape->z;
-    length = func_8001A314(&hit.x);
-    if (hit.y < 0) {
-        hit.y = -hit.y;
+    shape = object->shape;
+    hit.position = shape->position;
+    length = func_8001A314(&hit.position.x);
+    if (hit.position.y < 0) {
+        hit.position.y = -hit.position.y;
     }
     hit.strength = length >> 12;
     hit.mode = 2;
