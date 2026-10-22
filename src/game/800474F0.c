@@ -14,16 +14,23 @@ extern void func_80046A34(struct Unk4749CResource *resource);
 
 s32 func_800474F0(struct Unk4749CHandle *handle)
 {
+    s32 result;
+
+    result = 0;
     if (handle == 0) {
-        return 0;
+        goto set_result;
     }
     if (handle->resource == 0) {
-        return 0;
+        goto done;
     }
     if (handle->resource->serial != handle->serial) {
-        return 0;
+        goto done;
     }
     func_80046A34(handle->resource);
     handle->resource = 0;
-    return 1;
+    result = 1;
+set_result:
+    return result;
+done:
+    return result;
 }
