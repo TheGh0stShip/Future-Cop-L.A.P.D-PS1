@@ -618,6 +618,99 @@ def normalize_aspsx_state_entry_layout(text):
     return text
 
 
+def normalize_aspsx_palette_init_layout(text):
+    """Reproduce retail ordering for palette and global-state initialization."""
+    entity_store = "sw\t$0,%lo(D_800A8F90)($9)\n"
+    if text.count(entity_store) != 1:
+        raise ValueError("ASPSX palette entity-table store not found uniquely")
+    text = text.replace(entity_store, "", 1)
+    entity_anchor = "li\t$3,120\t\t\t# 0x00000078\n"
+    if text.count(entity_anchor) != 1:
+        raise ValueError("ASPSX palette entity-table anchor not found uniquely")
+    text = text.replace(entity_anchor, entity_anchor + entity_store, 1)
+
+    resource_store = re.compile(
+        r"lui\t\$2,%hi\(D_8009F9F4\) # high\n"
+        r"sw\t\$0,%lo\(D_8009F9F4\)\(\$2\)\n"
+    )
+    text, resource_fires = resource_store.subn("", text, count=1)
+    table_anchor = "sw\t$6,4($2)\n"
+    if text.count(table_anchor) != 1:
+        raise ValueError("ASPSX palette table anchor not found uniquely")
+    resource_replacement = (
+        ".set\tnoat\n"
+        "lui\t$at,%hi(D_8009F9F4)\n"
+        "sw\t$0,%lo(D_8009F9F4)($at)\n"
+        ".set\tat\n"
+    )
+    text = text.replace(table_anchor, resource_replacement + table_anchor, 1)
+
+    tail = re.compile(
+        r"li\t\$2,1\s+# 0x00000001\n"
+        r"sb\t\$2,%gp_rel\(D_8009F7AC\)\(\$gp\)\n"
+        r"lui\t\$2,%hi\(D_8009FA94\) # high\n"
+        r"lw\t\$5,%lo\(D_8009FA94\)\(\$2\) # DEBUG: leaving for assembler to expand\n"
+        r"#nop # DEBUG: 'addiu\t\$9,\$9,%lo\(D_800A8F90\) # low' does not load from \$5\n"
+        r"addiu\t\$9,\$9,%lo\(D_800A8F90\) # low\n"
+        r"lw\t\$3,92\(\$5\)\n"
+        r"#nop # DEBUG: 'li\t\$2,1\s+# 0x00000001' does not load from \$3\n"
+        r"li\t\$2,1\s+# 0x00000001\n"
+        r"sw\t\$0,%gp_rel\(D_8009F7A8\)\(\$gp\)\n"
+        r"beq\t\$3,\$2,\$L\d+\n"
+        r"li\t\$4,254\s+# 0x000000fe\n\s*"
+        r"lw\t\$3,12\(\$5\)\n"
+        r"#nop # DEBUG: 'li\t\$2,2\s+# 0x00000002' does not load from \$3\n"
+        r"li\t\$2,2\s+# 0x00000002\n"
+        r"bne\t\$3,\$2,\$L\d+\n"
+        r"li\t\$4,200\s+# 0x000000c8\n\s*"
+        r"li\t\$4,300\s+# 0x0000012c\n"
+        r"\$L\d+:\n"
+        r"sw\t\$4,4\(\$9\)\n"
+        r"lw\t\$18,8\(\$sp\)\n"
+        r"#nop # DEBUG: 'lw\t\$17,4\(\$sp\)' does not load from \$18\n"
+        r"lw\t\$17,4\(\$sp\)\n"
+        r"#nop # DEBUG: 'lw\t\$16,0\(\$sp\)' does not load from \$17\n"
+        r"lw\t\$16,0\(\$sp\)\n"
+        r"#nop # DEBUG: 'j\t\$31' does not load from \$16\n"
+        r"j\t\$31\n"
+        r"addu\t\$sp,\$sp,16\n"
+    )
+    tail_replacement = (
+        "li\t$2,1\n"
+        "lui\t$4,%hi(D_8009FA94)\n"
+        "lw\t$4,%lo(D_8009FA94)($4)\n"
+        "sb\t$2,%gp_rel(D_8009F7AC)($gp)\n"
+        "lw\t$3,92($4)\n"
+        "li\t$2,1\n"
+        "sw\t$0,%gp_rel(D_8009F7A8)($gp)\n"
+        "bne\t$3,$2,$Lpalette_secondary\n"
+        "addiu\t$9,$9,%lo(D_800A8F90)\n"
+        "j\t$Lpalette_store\n"
+        "li\t$2,254\n"
+        "$Lpalette_secondary:\n"
+        "lw\t$3,12($4)\n"
+        "li\t$2,2\n"
+        "bne\t$3,$2,$Lpalette_store\n"
+        "li\t$2,200\n"
+        "li\t$2,300\n"
+        "$Lpalette_store:\n"
+        "sw\t$2,4($9)\n"
+        "lw\t$18,8($sp)\n"
+        "lw\t$17,4($sp)\n"
+        "lw\t$16,0($sp)\n"
+        "addu\t$sp,$sp,16\n"
+        "j\t$31\n"
+        "nop\n"
+    )
+    text, tail_fires = tail.subn(tail_replacement, text, count=1)
+    if resource_fires != 1 or tail_fires != 1:
+        raise ValueError(
+            "ASPSX palette layout expected resource and tail patterns; found "
+            f"{resource_fires} and {tail_fires}"
+        )
+    return text
+
+
 def restore_aspsx_byte_test_temporary(text):
     """Restore a temporary register used for byte tests of saved values."""
     patterns = {
@@ -1304,6 +1397,10 @@ def validate(config):
             raise ValueError(
                 f"{unit['name']}: aspsx_state_entry_layout must be boolean"
             )
+        if not isinstance(unit.get("aspsx_palette_init_layout", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_palette_init_layout must be boolean"
+            )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
             if not isinstance(linker_symbols, dict):
@@ -1448,6 +1545,10 @@ def compile_unit(unit, config, prefix, work, environment=None):
     if unit.get("aspsx_state_entry_layout", False):
         processed.write_text(
             normalize_aspsx_state_entry_layout(processed.read_text())
+        )
+    if unit.get("aspsx_palette_init_layout", False):
+        processed.write_text(
+            normalize_aspsx_palette_init_layout(processed.read_text())
         )
     if marker_lines:
         marker_names = set(small_data_symbols)
