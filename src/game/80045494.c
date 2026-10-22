@@ -9,10 +9,13 @@ struct Unk7938 {
 extern u8 D_800A18D0[];
 extern struct Unk7938 D_800A7938[];
 
-u8 func_80045494(s32 id, u8 *table, s32 limit)
+s32 func_80045494(s32 id, u8 *table, s32 limit)
 {
-    s32 bias;
-    u8 slot;
+    register s32 bias __asm__("$2");
+    register s32 adjusted __asm__("$3");
+    register u8 *entry __asm__("$2");
+    register struct Unk7938 *base __asm__("$3");
+    register struct Unk7938 *record __asm__("$2");
 
     if (id >= 0x46) {
         table = D_800A18D0;
@@ -21,11 +24,20 @@ u8 func_80045494(s32 id, u8 *table, s32 limit)
     } else {
         bias = 0;
     }
-    if (id > 0 && id < limit) {
-        slot = table[id + bias];
-        if (D_800A7938[slot].active != 0) {
-            return slot;
+    adjusted = id + bias;
+    if (id > 0) {
+        if (id < limit) {
+            entry = &table[adjusted];
+            __asm__ volatile ("" : "+r" (entry));
+            base = D_800A7938;
+            id = *entry;
+            record = &base[id];
+            if (record->active != 0) {
+                goto done;
+            }
         }
     }
-    return 0xFF;
+    id = 0xFF;
+done:
+    return id;
 }
