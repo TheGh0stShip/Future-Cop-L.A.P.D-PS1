@@ -142,6 +142,15 @@ LIBGPU, LIBGTE, LIBPRESS, and LIBSPU code, while preserving version ambiguity
 where different catalogues contain identical objects. These names are
 attribution evidence and a reconstruction work queue; they do not count as
 matching C by themselves.
+
+The first source-backed LIBSPU probe, `SpuGetTransferMode` at `0x80098F78`,
+also established that SDK objects require their own build profiles. The
+corresponding 4.0 reconstruction metadata uses `-O3 -g0 -G0
+-funsigned-char`, rather than the game's usual `-O2` profile. Its recovered C
+reproduces 15 of 16 instructions with the Cygnus 2.7.2 lane; only the register
+chosen for the initial global-address materialization differs. It remains a
+candidate pending an exact original-compiler lane or a natural source-shape
+resolution and receives no matching credit.
 The intervening 212-byte initializer at `0x8008B094` is `_padLoadActInfo`; it
 lays out the mode, capability, and combination tables within a caller-provided
 buffer and installs the two command-processing callbacks.
