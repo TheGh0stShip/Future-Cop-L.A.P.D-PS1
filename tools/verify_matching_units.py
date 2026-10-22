@@ -757,6 +757,32 @@ def defer_aspsx_column_mask(text):
     return text[:match.start()] + replacement + text[match.end():]
 
 
+def normalize_aspsx_shared_byte_store_return(text):
+    """Merge an early return into a terminal byte-store epilogue."""
+    terminal = re.compile(
+        r"(?P<indent>\s*)j\t\$31\n"
+        r"(?P<store>sb\t\$([0-9]+),[^\n]+)\n\n"
+        r"(?P<end>\.end\t[^\n]+)"
+    )
+    match = terminal.search(text)
+    if match is None:
+        raise ValueError("ASPSX terminal byte-store return pattern not found")
+    label = "$L_aspsx_shared_return"
+    replacement = (
+        f"{match.group('indent')}{match.group('store')}\n"
+        f"{label}:\n"
+        "j\t$31\n"
+        "nop\n\n"
+        f"{match.group('end')}"
+    )
+    text = text[:match.start()] + replacement + text[match.end():]
+    early = re.compile(r"j\t\$31\n(addu\t\$2,\$0,\$zero\n)")
+    text, count = early.subn(f"j\t{label}\n\\1", text, count=1)
+    if count != 1:
+        raise ValueError("ASPSX early zero-return pattern not found")
+    return text
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -858,6 +884,10 @@ def validate(config):
         if not isinstance(unit.get("aspsx_defer_column_mask", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_defer_column_mask must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_shared_byte_store_return", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_shared_byte_store_return must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -982,6 +1012,10 @@ def compile_unit(unit, config, prefix, work, environment=None):
         processed.write_text(normalize_aspsx_context_wrapper(processed.read_text()))
     if unit.get("aspsx_defer_column_mask", False):
         processed.write_text(defer_aspsx_column_mask(processed.read_text()))
+    if unit.get("aspsx_shared_byte_store_return", False):
+        processed.write_text(
+            normalize_aspsx_shared_byte_store_return(processed.read_text())
+        )
     if marker_lines:
         marker_names = set(small_data_symbols)
         processed.write_text("\n".join(

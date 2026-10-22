@@ -12,6 +12,7 @@ from tools.verify_matching_units import (
     normalize_aspsx_line_packet,
     normalize_aspsx_context_wrapper,
     normalize_aspsx_packet_cursor,
+    normalize_aspsx_shared_byte_store_return,
     reorder_aspsx_argument_save_groups,
     reorder_aspsx_vector_copy_call_setup,
     rotate_aspsx_saved_body_registers,
@@ -26,6 +27,29 @@ from tools.verify_matching_units import (
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_merges_early_return_into_terminal_byte_store(self):
+        source = (
+            "j\t$31\n"
+            "addu\t$2,$0,$zero\n"
+            "$L_body:\n"
+            "sh\t$4,12($8)\n"
+            "j\t$31\n"
+            "sb\t$3,19($8)\n\n"
+            ".end\tfunc_test\n"
+        )
+        expected = (
+            "j\t$L_aspsx_shared_return\n"
+            "addu\t$2,$0,$zero\n"
+            "$L_body:\n"
+            "sh\t$4,12($8)\n"
+            "sb\t$3,19($8)\n"
+            "$L_aspsx_shared_return:\n"
+            "j\t$31\n"
+            "nop\n\n"
+            ".end\tfunc_test\n"
+        )
+        self.assertEqual(normalize_aspsx_shared_byte_store_return(source), expected)
+
     def test_defers_column_mask_until_after_row_base(self):
         source = (
             "andi\t$5,$5,0x00ff\n"

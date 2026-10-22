@@ -21,28 +21,42 @@ struct AnimTrack {
 
 struct AnimClip *func_800448D8(struct AnimTrack *track, s32 index, s32 direction, u8 flags)
 {
+    register struct AnimTrack *state __asm__("$8");
     struct AnimClip *clip;
+    register struct AnimClip *computed __asm__("$2");
+    register s32 offset __asm__("$3");
+    register u16 frame __asm__("$4");
+    u8 mergedFlags;
 
-    if (track->clips == 0) {
-        return 0;
+    state = track;
+    __asm__ volatile ("" : "+r" (state));
+    offset = index << 4;
+    if (state->clips == 0) {
+        computed = 0;
+        goto done;
     }
-    track->index = index;
-    clip = &track->clips[index];
-    track->clip = clip;
+    state->index = index;
+    computed = (struct AnimClip *)((u8 *)state->clips + offset);
+    clip = computed;
+    state->clip = computed;
     if (direction != 2) {
-        track->elapsed = 0;
+        state->elapsed = 0;
     }
     if (direction > 0) {
-        track->step = 1;
-        track->target = clip->end;
+        state->step = 1;
+        state->target = clip->end;
     } else {
-        track->step = -1;
-        track->target = clip->start;
+        state->step = -1;
+        state->target = clip->start;
     }
-    if (clip->end < clip->start) {
-        track->step = -track->step;
+    if (clip->start > clip->end) {
+        state->step = -state->step;
     }
-    track->flags |= flags;
-    track->frame = clip->start;
-    return clip;
+    computed = clip;
+    mergedFlags = state->flags | flags;
+    frame = clip->start;
+    state->frame = frame;
+    state->flags = mergedFlags;
+done:
+    return computed;
 }
