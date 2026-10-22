@@ -146,8 +146,7 @@ def compile_unit(unit, config, prefix, work, environment=None):
         address = number(unit["address"])
         linker_script.write_text(
             "SECTIONS\n{\n"
-            f"  . = {address:#x};\n"
-            "  .text : SUBALIGN(4) { *(.text) }\n"
+            f"  .text {address:#x} : SUBALIGN(4) {{ *(.text) }}\n"
             "  /DISCARD/ : { *(.MIPS.abiflags) *(.reginfo) *(.pdr) "
             "*(.gnu.attributes) }\n"
             "}\n"
