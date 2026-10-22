@@ -3748,6 +3748,20 @@
       "compiler": "gcc-2.7.2-cdk"
     },
     {
+      "name": "func_8006062C",
+      "address": "0x8006062C",
+      "size": "0x3C",
+      "source": "src/game/8006062C.c",
+      "compiler": "gcc-2.7.2-cdk",
+      "link": true,
+      "linker_symbols": {
+        "func_8001846C": "0x8001846C"
+      },
+      "symbols": {
+        "func_8001846C": "0x8001846C"
+      }
+    },
+    {
       "name": "func_800607B8",
       "address": "0x800607B8",
       "size": "0x80",
