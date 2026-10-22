@@ -214,3 +214,12 @@ matches the 76-byte request wrapper at `0x8003A8C0`; assigning the definition
 byte before the active flag preserves the retail load-delay nop in the 184-byte
 object initializer at `0x80042504`; and naming the two high-bit masks hoists
 their constants exactly in the 80-byte transform at `0x80060DD8`.
+
+A consolidated reconstruction pass over early engine, resource, input,
+memory-card, CD, and sound code added 107 independently rebuilt functions and
+9,824 matching bytes. The exact set spans gcc 2.7.2 CDK and PSX lanes plus two
+gcc 2.8.0 units; every unit was rebuilt through the primary verifier against
+the USA executable before promotion. The pass also confirms that four-byte
+absolute globals in `-G4` units must remain array declarations to avoid
+small-data addressing, while the recurring 16.16 multiply sequence is likely
+from an inline assembly macro rather than compiler-generated `long long` C.

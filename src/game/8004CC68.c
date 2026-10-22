@@ -14,7 +14,8 @@ void func_8004CC68(void)
 {
     s32 level;
 
-    level = (D_8009FAA4 >> 3) & 0x3F;
+    level = D_8009FAA4 >> 3;
+    level &= 0x3F;
     if (level >= 0x20) {
         level = 0x3F - level;
     }

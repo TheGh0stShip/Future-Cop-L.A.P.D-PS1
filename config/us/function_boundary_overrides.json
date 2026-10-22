@@ -1,7 +1,16 @@
 {
   "schema": 1,
-  "description": "Reviewed corrections for analyzer splits caused by a gp-relative load before the stack-frame prologue.",
+  "description": "Reviewed corrections for analyzer splits caused by setup instructions before the stack-frame prologue.",
   "functions": [
+    {"address": "0x80013AB4", "size": "0x3C", "remove_starts": ["0x80013AB8"]},
+    {"address": "0x80017BA0", "size": "0x48", "remove_starts": ["0x80017BA4"]},
+    {"address": "0x80017D20", "size": "0x3C", "remove_starts": ["0x80017D24"]},
+    {"address": "0x800198DC", "size": "0x28", "remove_starts": ["0x800198E0"]},
+    {"address": "0x80019D00", "size": "0x60", "remove_starts": ["0x80019D04"]},
+    {"address": "0x8001B448", "size": "0x60", "remove_starts": ["0x8001B44C"]},
+    {"address": "0x8001BFE4", "size": "0x50", "remove_starts": ["0x8001BFEC"]},
+    {"address": "0x80021250", "size": "0x4C", "remove_starts": ["0x80021254"]},
+    {"address": "0x80021C20", "size": "0x60", "remove_starts": ["0x80021C30"]},
     {"address": "0x80031990", "size": "0x44", "remove_starts": ["0x80031994"]},
     {"address": "0x8003D0AC", "size": "0x44", "remove_starts": ["0x8003D0B0"]},
     {"address": "0x8003FA34", "size": "0xA0", "remove_starts": ["0x8003FA38"]},
