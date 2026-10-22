@@ -8691,6 +8691,22 @@
       }
     },
     {
+      "name": "func_80045164",
+      "address": "0x80045164",
+      "size": "0x50",
+      "source": "src/game/80045164.c",
+      "compiler": "gcc-2.7.2-cdk",
+      "symbols": {
+        "D_800A1800": "0x800A1800",
+        "func_80045028": "0x80045028"
+      },
+      "link": true,
+      "linker_symbols": {
+        "D_800A1800": "0x800A1800",
+        "func_80045028": "0x80045028"
+      }
+    },
+    {
       "name": "func_800453B8",
       "address": "0x800453B8",
       "size": "0xDC",

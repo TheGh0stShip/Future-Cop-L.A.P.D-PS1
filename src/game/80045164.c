@@ -17,11 +17,17 @@ extern u8 func_80045028(s32 id);
 
 struct Unk45164Slot *func_80045164(s32 id)
 {
-    if (func_80045028(id) == 0) {
-        return 0;
+    register s32 valid __asm__("$3");
+    register struct Unk45164Slot *result __asm__("$2");
+    struct Unk45164Current *current;
+
+    valid = func_80045028(id);
+    result = 0;
+    if (valid != 0) {
+        current = &D_800A1800;
+        if (current->slot->key == current->key) {
+            result = current->slot;
+        }
     }
-    if (D_800A1800.slot->key != D_800A1800.key) {
-        return 0;
-    }
-    return D_800A1800.slot;
+    return result;
 }
