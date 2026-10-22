@@ -12,9 +12,13 @@ struct Unk4AA90 *func_8004AA90(void)
     struct Unk4AA90 *current;
 
     current = D_8009F798;
-    if (current->next != 0) {
-        D_8009F798 = current->next;
-        return current;
+    if (current->next == 0) {
+        goto empty;
     }
-    return 0;
+    D_8009F798 = current->next;
+    goto done;
+empty:
+    current = 0;
+done:
+    return current;
 }
