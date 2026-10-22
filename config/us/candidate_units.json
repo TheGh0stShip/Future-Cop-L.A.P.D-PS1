@@ -16,21 +16,6 @@
   ],
   "units": [
     {
-      "name": "func_8001E620",
-      "address": "0x8001E620",
-      "size": "0x198",
-      "source": "src/game/8001E620.c",
-      "symbols": {
-        "D_800AAC50": "0x800AAC50",
-        "func_8001EF8C": "0x8001EF8C"
-      },
-      "link": true,
-      "linker_symbols": {
-        "D_800AAC50": "0x800AAC50",
-        "func_8001EF8C": "0x8001EF8C"
-      }
-    },
-    {
       "name": "func_800516A0",
       "address": "0x800516A0",
       "size": "0x208",

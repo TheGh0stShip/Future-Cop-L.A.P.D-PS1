@@ -14,6 +14,9 @@ u32 func_8001E620(u32 profile)
     register u32 result __asm__("$4");
     register u32 offset __asm__("$3");
     register u32 returnValue __asm__("$2");
+    register u32 firstMask __asm__("$2");
+    register u32 secondMask __asm__("$3");
+    register u32 firstSet __asm__("$2");
 
     pressed = func_8001EF8C();
     result = 0;
@@ -21,9 +24,11 @@ u32 func_8001E620(u32 profile)
         offset = (profile * 8) - profile;
         offset <<= 3;
         map = (struct InputMaskMap *)((u8 *)D_800AAC50 + offset);
-        result = (pressed & map->masks[0]) != 0;
-        result <<= 30;
-        if (pressed & map->masks[1]) {
+        firstMask = map->masks[0];
+        secondMask = map->masks[1];
+        firstSet = (pressed & firstMask) != 0;
+        result = firstSet << 30;
+        if (pressed & secondMask) {
             result |= 0x80000000;
         }
         if (pressed & map->masks[2]) {
@@ -59,7 +64,8 @@ u32 func_8001E620(u32 profile)
         if (pressed & map->masks[11]) {
             result |= 0x00200000;
         }
-        if (pressed & map->masks[10]) {
+        firstSet = pressed & map->masks[10];
+        if (firstSet) {
             result |= 0x00100000;
         }
     }

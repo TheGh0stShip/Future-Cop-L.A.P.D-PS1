@@ -14,6 +14,16 @@
   ],
   "units": [
     {
+      "name": "func_8001E620",
+      "address": "0x8001E620",
+      "size": "0x198",
+      "source": "src/game/8001E620.c",
+      "compiler": "gcc-2.7.2-cdk",
+      "symbols": {"D_800AAC50": "0x800AAC50", "func_8001EF8C": "0x8001EF8C"},
+      "link": true,
+      "linker_symbols": {"D_800AAC50": "0x800AAC50", "func_8001EF8C": "0x8001EF8C"}
+    },
+    {
       "name": "func_80017994",
       "address": "0x80017994",
       "size": "0x194",
