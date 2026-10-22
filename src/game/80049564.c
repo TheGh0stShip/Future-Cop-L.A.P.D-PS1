@@ -20,7 +20,7 @@ void func_80049564(s32 elapsed)
     s32 remaining;
 
     timer = D_8009F770;
-    for (i = 0; i < D_8009F774; i++, timer++) {
+    for (i = 0; i < D_8009F774; timer++, i++) {
         if (timer->count == 0) {
             continue;
         }
