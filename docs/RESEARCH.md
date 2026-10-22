@@ -229,3 +229,10 @@ handler required retaining an unsigned byte load while comparing a promoted
 signed local, the 208-byte angle interpolator used the branchless
 `((sign + value) ^ sign)` absolute-value idiom, and the 168-byte fixed-pool
 initializer used integer address addition to preserve operand order.
+
+The next size-weighted pass added C candidates for a 228-byte model-coordinate
+resolver and two related 224/228-byte frustum tests. The model routine is within
+seven words on the 2.7.2 CDK lane; the frustum pair is within eleven words each
+on the 2.7.2 PSX lane. A ten-function sweep confirmed that GCC 2.6.3 does not
+improve this large-candidate group, so their established compiler lanes remain
+unchanged.
