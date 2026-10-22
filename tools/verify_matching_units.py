@@ -431,6 +431,39 @@ def defer_aspsx_saved_call_argument(text):
     return text.replace(source, replacement)
 
 
+def expand_aspsx_indexed_return_store(text):
+    """Materialize an indexed global store and place it in the return slot."""
+    lines = text.splitlines()
+    shift = re.compile(r"\s*sll\s+\$(\d+),\$(\d+),(\d+)\s*")
+    store = re.compile(
+        r"\s*sw\s+\$(\d+),([A-Za-z_][A-Za-z0-9_]*)(?:\+(-?\d+))?\(\$(\d+)\)\s*"
+    )
+    for index in range(len(lines) - 3):
+        shift_match = shift.fullmatch(lines[index])
+        store_match = store.fullmatch(lines[index + 1])
+        if not shift_match or not store_match:
+            continue
+        address_register, source_register, amount = shift_match.groups()
+        value_register, symbol, offset, store_base = store_match.groups()
+        if address_register != store_base:
+            continue
+        if lines[index + 2].strip() != "j\t$31":
+            continue
+        if not lines[index + 3].strip().startswith("nop"):
+            continue
+        displacement = offset or "0"
+        lines[index:index + 4] = [
+            f"lui\t$3,%hi({symbol})",
+            f"addiu\t$3,$3,%lo({symbol})",
+            f"sll\t${address_register},${source_register},{amount}",
+            f"addu\t${address_register},${address_register},$3",
+            "j\t$31",
+            f"sw\t${value_register},{displacement}(${address_register})",
+        ]
+        return "\n".join(lines) + "\n"
+    raise ValueError("ASPSX indexed return-store pattern not found")
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -500,6 +533,10 @@ def validate(config):
         if not isinstance(unit.get("aspsx_defer_saved_call_argument", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_defer_saved_call_argument must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_expand_indexed_return_store", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_expand_indexed_return_store must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -601,6 +638,10 @@ def compile_unit(unit, config, prefix, work, environment=None):
     if unit.get("aspsx_defer_saved_call_argument", False):
         processed.write_text(
             defer_aspsx_saved_call_argument(processed.read_text())
+        )
+    if unit.get("aspsx_expand_indexed_return_store", False):
+        processed.write_text(
+            expand_aspsx_indexed_return_store(processed.read_text())
         )
     if marker_lines:
         marker_names = set(small_data_symbols)

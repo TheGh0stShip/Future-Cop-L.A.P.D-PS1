@@ -302,20 +302,6 @@
       }
     },
     {
-      "name": "func_80045884",
-      "address": "0x80045884",
-      "size": "0x64",
-      "source": "src/game/80045884.c",
-      "symbols": {
-        "D_800A1920": "0x800A1920"
-      },
-      "link": true,
-      "linker_symbols": {
-        "D_800A1920": "0x800A1920"
-      },
-      "compiler": "gcc-2.7.2-psx"
-    },
-    {
       "name": "func_800474C4",
       "address": "0x800474C4",
       "size": "0x2C",

@@ -1441,6 +1441,21 @@
       }
     },
     {
+      "name": "func_80045884",
+      "address": "0x80045884",
+      "size": "0x64",
+      "source": "src/game/80045884.c",
+      "symbols": {
+        "D_800A1920": "0x800A1920"
+      },
+      "link": true,
+      "linker_symbols": {
+        "D_800A1920": "0x800A1920"
+      },
+      "compiler": "gcc-2.6.3-psx",
+      "aspsx_expand_indexed_return_store": true
+    },
+    {
       "name": "func_8004665C",
       "address": "0x8004665C",
       "size": "0x3C",

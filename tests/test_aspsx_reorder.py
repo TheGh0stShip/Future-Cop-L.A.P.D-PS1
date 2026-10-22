@@ -2,6 +2,7 @@ import unittest
 
 from tools.verify_matching_units import (
     defer_aspsx_saved_call_argument,
+    expand_aspsx_indexed_return_store,
     fill_aspsx_symbolic_load_delay_slot,
     hoist_aspsx_small_data_load_before_prologue,
     move_aspsx_load_delay_label,
@@ -18,6 +19,23 @@ from tools.verify_matching_units import (
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_expands_indexed_store_into_return_slot(self):
+        source = (
+            "sll\t$2,$7,4\n"
+            "sw\t$6,D_table+12($2)\n"
+            "j\t$31\n"
+            "nop  # DEBUG: branch/jump\n"
+        )
+        expected = (
+            "lui\t$3,%hi(D_table)\n"
+            "addiu\t$3,$3,%lo(D_table)\n"
+            "sll\t$2,$7,4\n"
+            "addu\t$2,$2,$3\n"
+            "j\t$31\n"
+            "sw\t$6,12($2)\n"
+        )
+        self.assertEqual(expand_aspsx_indexed_return_store(source), expected)
+
     def test_defers_saved_fourth_call_argument(self):
         source = (
             "sw\t$17,52($sp)\naddu\t$17,$5,$zero\n"
