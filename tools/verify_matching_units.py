@@ -398,6 +398,39 @@ def reuse_aspsx_call_constant(text):
     raise ValueError("ASPSX repeated call-constant pattern not found")
 
 
+def defer_aspsx_saved_call_argument(text):
+    """Defer saving a fourth argument until the first call delay slot."""
+    source = (
+        "sw\t$17,52($sp)\n"
+        "addu\t$17,$5,$zero\n"
+        "sw\t$18,56($sp)\n"
+        "addu\t$18,$6,$zero\n"
+        "sw\t$16,48($sp)\n"
+        "addu\t$16,$7,$zero\n"
+        "addu\t$4,$sp,16\n"
+        "la\t$5,D_8009F368\n"
+        "sw\t$31,60($sp)\n"
+        "jal\tfunc_8008CD30\n"
+        "addu\t$6,$2,$zero\n"
+    )
+    replacement = (
+        "sw\t$17,52($sp)\n"
+        "addu\t$17,$5,$zero\n"
+        "sw\t$18,56($sp)\n"
+        "addu\t$18,$6,$zero\n"
+        "addu\t$4,$sp,16\n"
+        "la\t$5,D_8009F368\n"
+        "addu\t$6,$2,$zero\n"
+        "sw\t$16,48($sp)\n"
+        "sw\t$31,60($sp)\n"
+        "jal\tfunc_8008CD30\n"
+        "addu\t$16,$7,$zero\n"
+    )
+    if text.count(source) != 1:
+        raise ValueError("ASPSX saved call-argument pattern not found")
+    return text.replace(source, replacement)
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -463,6 +496,10 @@ def validate(config):
         if not isinstance(unit.get("aspsx_reuse_call_constant", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_reuse_call_constant must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_defer_saved_call_argument", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_defer_saved_call_argument must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -561,6 +598,10 @@ def compile_unit(unit, config, prefix, work, environment=None):
         )
     if unit.get("aspsx_reuse_call_constant", False):
         processed.write_text(reuse_aspsx_call_constant(processed.read_text()))
+    if unit.get("aspsx_defer_saved_call_argument", False):
+        processed.write_text(
+            defer_aspsx_saved_call_argument(processed.read_text())
+        )
     if marker_lines:
         marker_names = set(small_data_symbols)
         processed.write_text("\n".join(

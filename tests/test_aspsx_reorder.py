@@ -1,6 +1,7 @@
 import unittest
 
 from tools.verify_matching_units import (
+    defer_aspsx_saved_call_argument,
     fill_aspsx_symbolic_load_delay_slot,
     hoist_aspsx_small_data_load_before_prologue,
     move_aspsx_load_delay_label,
@@ -17,6 +18,19 @@ from tools.verify_matching_units import (
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_defers_saved_fourth_call_argument(self):
+        source = (
+            "sw\t$17,52($sp)\naddu\t$17,$5,$zero\n"
+            "sw\t$18,56($sp)\naddu\t$18,$6,$zero\n"
+            "sw\t$16,48($sp)\naddu\t$16,$7,$zero\n"
+            "addu\t$4,$sp,16\nla\t$5,D_8009F368\n"
+            "sw\t$31,60($sp)\njal\tfunc_8008CD30\n"
+            "addu\t$6,$2,$zero\n"
+        )
+        result = defer_aspsx_saved_call_argument(source)
+        self.assertIn("addu\t$6,$2,$zero\nsw\t$16,48($sp)", result)
+        self.assertTrue(result.endswith("jal\tfunc_8008CD30\naddu\t$16,$7,$zero\n"))
+
     def test_uses_symbolic_address_scratch_for_adjacent_addresses(self):
         source = "la\t$4,left\nla\t$3,right\nli\t$2,1\n"
         expected = (

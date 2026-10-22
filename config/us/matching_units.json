@@ -2000,6 +2000,25 @@
       "compiler": "gcc-2.7.2-cdk"
     },
     {
+      "name": "func_800491F8",
+      "address": "0x800491F8",
+      "size": "0x68",
+      "source": "src/game/800491F8.c",
+      "symbols": {
+        "D_8009F368": "0x8009F368",
+        "func_80049100": "0x80049100",
+        "func_8008CD30": "0x8008CD30"
+      },
+      "link": true,
+      "linker_symbols": {
+        "D_8009F368": "0x8009F368",
+        "func_80049100": "0x80049100",
+        "func_8008CD30": "0x8008CD30"
+      },
+      "compiler": "gcc-2.6.3-psx",
+      "aspsx_defer_saved_call_argument": true
+    },
+    {
       "name": "func_80049260",
       "address": "0x80049260",
       "size": "0x40",
