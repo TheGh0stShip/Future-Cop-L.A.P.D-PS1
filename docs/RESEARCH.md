@@ -165,6 +165,12 @@ Three additional LIBSPU wrappers match under the same Cygnus `-O3` profile:
 the DMA callback bridge at `0x800979F8`, the cold-start initializer at
 `0x80097A28`, and `SpuSetReverbVoice` at `0x80098788`. Their 104 verified bytes
 exclude trailing object-alignment zeros.
+
+Six small LIBCD entry points add another 196 verified bytes: `CdFlush`,
+`CdSync`, `CdReady`, `CdGetSector`, `CdDataCallback`, and `CdDataSync`.
+Five match the Cygnus 2.7.2 SDK profile, while `CdGetSector` selects 2.8.1
+with otherwise identical object flags. The linked SDK region therefore mixes
+compiler provenance even among adjacent public API wrappers.
 The intervening 212-byte initializer at `0x8008B094` is `_padLoadActInfo`; it
 lays out the mode, capability, and combination tables within a caller-provided
 buffer and installs the two command-processing callbacks.
