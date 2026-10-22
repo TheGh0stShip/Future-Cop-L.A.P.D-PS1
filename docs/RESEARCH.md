@@ -151,6 +151,11 @@ reproduces 15 of 16 instructions with the Cygnus 2.7.2 lane; only the register
 chosen for the initial global-address materialization differs. It remains a
 candidate pending an exact original-compiler lane or a natural source-shape
 resolution and receives no matching credit.
+
+The same LIBSPU profile exactly reproduces `SpuSetIRQAddr` at `0x80098BB8`
+and the interrupt callback wrapper at `0x80098C38`, adding 100 verified bytes.
+Their neighboring callback setter and transfer-address routines remain
+source-backed candidates; they are kept separate from the exact manifest.
 The intervening 212-byte initializer at `0x8008B094` is `_padLoadActInfo`; it
 lays out the mode, capability, and combination tables within a caller-provided
 buffer and installs the two command-processing callbacks.
