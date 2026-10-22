@@ -95,3 +95,6 @@ tracks combination storage, and rejects command buffers larger than 128 bytes.
 The associated actuator-information dispatcher at `0x8008B168` and six-byte
 actuator-map builder at `0x8008B508` add a further 368 exact bytes under the
 2.7.2 compiler lane.
+The intervening 212-byte initializer at `0x8008B094` is `_padLoadActInfo`; it
+lays out the mode, capability, and combination tables within a caller-provided
+buffer and installs the two command-processing callbacks.
