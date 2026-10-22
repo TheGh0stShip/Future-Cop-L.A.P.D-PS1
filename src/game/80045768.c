@@ -18,14 +18,19 @@ extern struct SoundChannel D_800A1160[];
 
 s32 func_80045768(s32 arg0, s32 index)
 {
+    register struct SoundChannel *base __asm__("$3");
     struct SoundChannel *channel;
-    s32 result;
+    register s32 active __asm__("$2");
+    register s32 result __asm__("$6");
 
     result = 0;
     if (index >= 0) {
-        channel = &D_800A1160[index];
+        base = D_800A1160;
+        channel = &base[index];
         if (channel->id != -1) {
-            result = channel->priority != 0;
+            active = channel->priority != 0;
+            __asm__ volatile ("" : "+r" (active));
+            result = active;
         }
     }
     return result;
