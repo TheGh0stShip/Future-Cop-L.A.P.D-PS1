@@ -868,6 +868,16 @@
       "compiler": "gcc-2.7.2-cdk"
     },
     {
+      "name": "func_80044AE8",
+      "address": "0x80044AE8",
+      "size": "0x4C",
+      "source": "src/game/80044AE8.c",
+      "symbols": {},
+      "link": true,
+      "linker_symbols": {},
+      "compiler": "gcc-2.8.1-psx"
+    },
+    {
       "name": "func_80044F8C",
       "address": "0x80044F8C",
       "size": "0x60",
