@@ -16,6 +16,36 @@
   ],
   "units": [
     {
+      "name": "func_80095C30",
+      "address": "0x80095C30",
+      "size": "0x174",
+      "source": "src/game/80095C30.c",
+      "maspsx_flags": [
+        "--dont-expand-li",
+        "--expand-div"
+      ],
+      "symbols": {
+        "D_8009E0A0": "0x8009E0A0"
+      },
+      "link": true,
+      "linker_symbols": {
+        "D_8009E0A0": "0x8009E0A0"
+      }
+    },
+    {
+      "name": "func_80098FE8",
+      "address": "0x80098FE8",
+      "size": "0x37C",
+      "source": "src/game/80098FE8.c",
+      "symbols": {
+        "D_8009EEA4": "0x8009EEA4"
+      },
+      "link": true,
+      "linker_symbols": {
+        "D_8009EEA4": "0x8009EEA4"
+      }
+    },
+    {
       "name": "func_80096748",
       "address": "0x80096748",
       "size": "0x610",
