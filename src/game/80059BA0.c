@@ -8,13 +8,19 @@ extern void func_800181D4(void *block);
 void *func_80059BA0(s32 name)
 {
     void *data;
+    void *result;
     s32 size;
 
     if (func_8001E110(name, D_8009F238, &data, &size, 0) > 0) {
-        return data;
+        goto success;
     }
     if (data != 0) {
         func_800181D4(data);
     }
-    return 0;
+    result = 0;
+    goto done;
+success:
+    result = data;
+done:
+    return result;
 }
