@@ -55,3 +55,18 @@ unchanged; the decisive differences were scheduling and epilogue placement.
 Compiler selection therefore remains per-unit evidence rather than a global
 assumption. Switch lowering, division, GTE scheduling, and small-data behavior
 still require representative matches.
+
+## Cross-project executable comparison
+
+`tools/cross_corpus_matches.py` compares audited Future Cop function ranges
+against another user-supplied PS1 code image. Exact hits are reported
+separately from a conservative near-match lane that masks only the 26-bit
+destination fields of MIPS `J` and `JAL` instructions.
+
+An initial read-only scan against the BattleTanx: Global Assault PS1 code image
+found 29 exact occurrences representing 23 distinct Future Cop functions of at
+least 24 bytes, plus 185 jump-normalized occurrences. Thirteen of the exact
+functions were not yet present in the matching manifest. The largest exact
+shared sequences were 260 and 128 bytes. These are candidate correspondences,
+not matching-decompilation credit: a function counts only after independently
+written C passes the USA retail-byte verifier.

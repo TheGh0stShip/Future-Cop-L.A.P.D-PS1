@@ -1,7 +1,7 @@
 # Future Cop: L.A.P.D. (USA) matching decompilation
 
-[![Code](https://img.shields.io/badge/code-1708%2F555552-red)](https://bytematch.dev/TheGh0stShip/Future-Cop-L.A.P.D-PS1)
-[![Functions](https://img.shields.io/badge/functions-69%2F1886-red)](https://bytematch.dev/TheGh0stShip/Future-Cop-L.A.P.D-PS1)
+[![Code](https://img.shields.io/badge/code-4644%2F555552-red)](https://bytematch.dev/TheGh0stShip/Future-Cop-L.A.P.D-PS1)
+[![Functions](https://img.shields.io/badge/functions-114%2F1880-red)](https://bytematch.dev/TheGh0stShip/Future-Cop-L.A.P.D-PS1)
 [![Verify](https://github.com/TheGh0stShip/Future-Cop-L.A.P.D-PS1/actions/workflows/verify.yml/badge.svg)](https://github.com/TheGh0stShip/Future-Cop-L.A.P.D-PS1/actions/workflows/verify.yml)
 
 An in-progress, byte-matching C reconstruction of the North American
@@ -14,7 +14,7 @@ repository.
 The current scaffold verifies the exact USA executable, extracts the disc,
 splits 100% of the executable with Splat, inventories provisional function
 starts, pins the PSX compiler toolchain, and compares reviewed C units directly
-to retail bytes. Sixty-nine functions totaling 1,708 bytes currently match. Provisional assembly,
+to retail bytes. 114 functions totaling 4,644 bytes currently match. Provisional assembly,
 generated static-recompiler output, and boundary guesses do not count as
 matching C.
 
@@ -34,7 +34,7 @@ declared in `config/us/matching_units.json`.
 The default-branch workflow publishes it as `SLUS-00739_report` for
 [ByteMatch](https://bytematch.dev/TheGh0stShip/Future-Cop-L.A.P.D-PS1) and
 compatible public progress trackers. The current denominator is the audited
-static-analysis catalogue: 1,886 non-data, non-alias function ranges covering
+static-analysis catalogue: 1,880 non-data, non-alias function ranges covering
 555,552 bytes. Only units that pass the retail-byte verifier receive progress.
 
 For unattended local candidate searches, see the
