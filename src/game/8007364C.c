@@ -14,8 +14,8 @@ extern void func_80071B40(struct Unk7364C *node, s32 arg);
 void func_8007364C(s32 arg)
 {
     struct Unk7364C *node;
-    struct Unk7364C *next;
-    struct Unk7364C *previous;
+    register struct Unk7364C *previous __asm__("$18");
+    register struct Unk7364C *next __asm__("$17");
     u16 flags;
 
     previous = 0;

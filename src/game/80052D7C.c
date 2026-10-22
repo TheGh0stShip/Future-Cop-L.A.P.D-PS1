@@ -36,13 +36,25 @@ extern void func_80010234(u8 *frame, u8 *output, s32 count);
 void func_80052D7C(struct Unk52D7C *object)
 {
     struct Unk52D7CState *state;
+    register u8 *pointer __asm__("$2");
+    register s32 offset __asm__("$4");
 
     state = object->info->state;
     func_80052960(object->coord, state->parts[0].matrix, state->parts[1].matrix);
     func_80010750(state->parts[0].matrix);
-    func_80010234(state->parts[0].model->frames + (state->parts[0].frame << 4) + 8,
-                  state->parts[0].output, 1);
+    offset = state->parts[0].frame;
+    pointer = (u8 *)state->parts[0].model;
+    offset <<= 4;
+    __asm__("" : "=r"(offset) : "0"(offset));
+    pointer = ((struct Unk52D7CModel *)pointer)->frames;
+    offset += 8;
+    func_80010234(pointer + offset, state->parts[0].output, 1);
     func_80010750(state->parts[1].matrix);
-    func_80010234(state->parts[1].model->frames + (state->parts[1].frame << 4) + 8,
-                  state->parts[1].output, 1);
+    offset = state->parts[1].frame;
+    pointer = (u8 *)state->parts[1].model;
+    offset <<= 4;
+    __asm__("" : "=r"(offset) : "0"(offset));
+    pointer = ((struct Unk52D7CModel *)pointer)->frames;
+    offset += 8;
+    func_80010234(pointer + offset, state->parts[1].output, 1);
 }
