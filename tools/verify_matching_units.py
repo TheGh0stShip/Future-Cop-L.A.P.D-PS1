@@ -548,6 +548,70 @@ def normalize_aspsx_indexed_byte_access(text):
     return text
 
 
+def normalize_aspsx_packet_cursor(text):
+    """Restore retail packet-cursor expansion and loop temporaries."""
+    cursor = re.compile(
+        r"lui\t\$3,%hi\(([^)]+)\)[^\n]*\n"
+        r"lui\t\$2,%hi\(([^)]+)\)[^\n]*\n"
+        r"lw\t\$4,%lo\(\1\)\(\$3\)[^\n]*\n"
+        r"#nop[^\n]*\n"
+        r"lw\t\$2,%lo\(\2\)\(\$2\)[^\n]*\n"
+        r"nop[^\n]*\n"
+        r"sltu\t\$2,\$4,\$2\n"
+        r"beq\t\$2,\$0,(\$L\d+)\n"
+        r"addu\t\$2,\$4,28\n\n"
+        r"sw\t\$2,%lo\(\1\)\(\$3\)\n"
+    )
+    match = cursor.search(text)
+    if match is None:
+        raise ValueError("ASPSX packet-cursor pattern not found")
+    current, limit, label = match.groups()
+    replacement = (
+        f"lui\t$3,%hi({current})\n"
+        f"lw\t$3,%lo({current})($3)\n"
+        f"lui\t$2,%hi({limit})\n"
+        f"lw\t$2,%lo({limit})($2)\n"
+        "nop\n"
+        "sltu\t$2,$3,$2\n"
+        f"beq\t$2,$0,{label}\n"
+        "addu\t$4,$3,$zero\n"
+        "addu\t$2,$4,28\n"
+        ".set\tnoat\n"
+        f"lui\t$at,%hi({current})\n"
+        f"sw\t$2,%lo({current})($at)\n"
+        ".set\tat\n"
+    )
+    text = text[:match.start()] + replacement + text[match.end():]
+    delta = re.compile(
+        r"beq\t\$4,\$0,(\$L\d+)\n"
+        r"addu\t\$3,\$4,-10\n\n"
+        r"sltu\t\$2,\$3,22\n"
+        r"beq\t\$2,\$0,(\$L\d+)\n"
+        r"addu\t\$16,\$16,1\n\n"
+        r"j\t(\$L\d+)\n"
+        r"addu\t\$18,\$3,\$zero\n"
+    )
+    match = delta.search(text)
+    if match is None:
+        raise ValueError("ASPSX packet control-code pattern not found")
+    done, draw, loop = match.groups()
+    replacement = (
+        f"beq\t$4,$0,{done}\n"
+        "addu\t$2,$4,-10\n\n"
+        "sltu\t$2,$2,22\n"
+        f"beq\t$2,$0,{draw}\n"
+        "addu\t$16,$16,1\n\n"
+        f"j\t{loop}\n"
+        "addu\t$18,$4,-10\n"
+    )
+    text = text[:match.start()] + replacement + text[match.end():]
+    epilogue = re.compile(r"j\t\$31\naddu\t\$sp,\$sp,40\n")
+    text, count = epilogue.subn("addu\t$sp,$sp,40\nj\t$31\nnop\n", text)
+    if count != 1:
+        raise ValueError("ASPSX packet return pattern not found")
+    return text
+
+
 def validate(config):
     ranges = []
     names = set()
@@ -633,6 +697,10 @@ def validate(config):
         if not isinstance(unit.get("aspsx_indexed_byte_access", False), bool):
             raise ValueError(
                 f"{unit['name']}: aspsx_indexed_byte_access must be boolean"
+            )
+        if not isinstance(unit.get("aspsx_packet_cursor", False), bool):
+            raise ValueError(
+                f"{unit['name']}: aspsx_packet_cursor must be boolean"
             )
         if unit.get("link", False):
             linker_symbols = unit.get("linker_symbols", {})
@@ -749,6 +817,8 @@ def compile_unit(unit, config, prefix, work, environment=None):
         processed.write_text(
             normalize_aspsx_indexed_byte_access(processed.read_text())
         )
+    if unit.get("aspsx_packet_cursor", False):
+        processed.write_text(normalize_aspsx_packet_cursor(processed.read_text()))
     if marker_lines:
         marker_names = set(small_data_symbols)
         processed.write_text("\n".join(

@@ -14,7 +14,7 @@ extern s32 D_8009F76C;
 
 extern s32 func_80048F98(s32 character, s32 x, s32 y, u16 color);
 
-void func_80049100(u8 *text, s32 x, s32 y, u16 color)
+void func_80049100(u8 *text, s32 x, s32 y, s32 color)
 {
     struct DrawTPage *packet;
     u32 character;

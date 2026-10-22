@@ -8,6 +8,7 @@ from tools.verify_matching_units import (
     hoist_aspsx_small_data_load_before_prologue,
     move_aspsx_load_delay_label,
     normalize_aspsx_indexed_byte_access,
+    normalize_aspsx_packet_cursor,
     reorder_aspsx_argument_save_groups,
     reorder_aspsx_vector_copy_call_setup,
     rotate_aspsx_saved_body_registers,
@@ -22,6 +23,34 @@ from tools.verify_matching_units import (
 
 
 class AspsxReorderTests(unittest.TestCase):
+    def test_normalizes_packet_cursor_control_code_and_return(self):
+        source = (
+            "lui\t$3,%hi(D_current) # high\n"
+            "lui\t$2,%hi(D_limit) # high\n"
+            "lw\t$4,%lo(D_current)($3) # linked\n"
+            "#nop # load delay\n"
+            "lw\t$2,%lo(D_limit)($2) # linked\n"
+            "nop # load delay\n"
+            "sltu\t$2,$4,$2\n"
+            "beq\t$2,$0,$L3\n"
+            "addu\t$2,$4,28\n\n"
+            "sw\t$2,%lo(D_current)($3)\n"
+            "beq\t$4,$0,$L1\n"
+            "addu\t$3,$4,-10\n\n"
+            "sltu\t$2,$3,22\n"
+            "beq\t$2,$0,$L7\n"
+            "addu\t$16,$16,1\n\n"
+            "j\t$L10\n"
+            "addu\t$18,$3,$zero\n"
+            "j\t$31\n"
+            "addu\t$sp,$sp,40\n"
+        )
+        result = normalize_aspsx_packet_cursor(source)
+        self.assertIn("lw\t$3,%lo(D_current)($3)", result)
+        self.assertIn("addu\t$4,$3,$zero", result)
+        self.assertIn("addu\t$18,$4,-10", result)
+        self.assertTrue(result.endswith("addu\t$sp,$sp,40\nj\t$31\nnop\n"))
+
     def test_normalizes_indexed_byte_access_and_shared_return(self):
         source = (
             "beq\t$2,$0,$L10\n"
