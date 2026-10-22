@@ -104,3 +104,6 @@ It matches under GCC 2.7.2 and confirms `D_800A3B80` as the active combination
 payload cursor.
 The 104-byte `_padSetActAlign` routine at `0x8008B484` completes the path that
 installs the actuator command emitter and six-byte map response handler.
+The 332-byte main-mode chain at `0x8008B5D0..0x8008B71B` reconstructs
+`_padSetMainMode`, its command emitter, and its completion handler. The setup
+uses GCC 2.8.1; both callbacks match the 2.7.2 scheduling lane.
