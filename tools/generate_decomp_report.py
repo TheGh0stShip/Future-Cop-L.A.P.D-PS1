@@ -12,12 +12,18 @@ ROOT = Path(__file__).resolve().parents[1]
 ANALYSIS = ROOT / "analysis/analysis.json"
 MATCHING_UNITS = ROOT / "config/us/matching_units.json"
 BOUNDARY_OVERRIDES = ROOT / "config/us/function_boundary_overrides.json"
+EXECUTABLE_DATA = ROOT / "config/us/executable_data_ranges.json"
+EXECUTABLE_PADDING = ROOT / "src/data/executable_padding.json"
+ASSET_LEDGER = ROOT / "config/us/asset_ledger.json"
+MATCHING_ASSETS = ROOT / "config/us/matching_assets.json"
 DEFAULT_OUTPUT = ROOT / "build/report.json"
 
 
 def measures(total_code: int, matched_code: int, total_functions: int,
-             matched_functions: int) -> dict:
+             matched_functions: int, total_data: int = 0,
+             matched_data: int = 0) -> dict:
     code_percent = matched_code * 100.0 / total_code if total_code else 0.0
+    data_percent = matched_data * 100.0 / total_data if total_data else 0.0
     function_percent = (
         matched_functions * 100.0 / total_functions if total_functions else 0.0
     )
@@ -26,19 +32,62 @@ def measures(total_code: int, matched_code: int, total_functions: int,
         "total_code": str(total_code),
         "matched_code": str(matched_code),
         "matched_code_percent": code_percent,
-        "total_data": "0",
-        "matched_data": "0",
-        "matched_data_percent": 0.0,
+        "total_data": str(total_data),
+        "matched_data": str(matched_data),
+        "matched_data_percent": data_percent,
         "total_functions": total_functions,
         "matched_functions": matched_functions,
         "matched_functions_percent": function_percent,
         "complete_code": str(matched_code),
         "complete_code_percent": code_percent,
-        "complete_data": "0",
-        "complete_data_percent": 0.0,
+        "complete_data": str(matched_data),
+        "complete_data_percent": data_percent,
         "total_units": total_functions,
         "complete_units": matched_functions,
     }
+
+
+def data_measures(total: int, matched: int) -> dict:
+    """Expose data progress in category panels that display code measures."""
+    result = measures(total, matched, 0, 0, total_data=total, matched_data=matched)
+    result["fuzzy_match_percent"] = result["matched_data_percent"]
+    result["total_code"] = str(total)
+    result["matched_code"] = str(matched)
+    result["matched_code_percent"] = result["matched_data_percent"]
+    result["complete_code"] = str(matched)
+    result["complete_code_percent"] = result["matched_data_percent"]
+    return result
+
+
+def noncode_progress() -> tuple[int, int, int, int, dict[str, tuple[int, int]]]:
+    executable = json.loads(EXECUTABLE_DATA.read_text())
+    padding = json.loads(EXECUTABLE_PADDING.read_text())
+    ledger = json.loads(ASSET_LEDGER.read_text())
+    matching = json.loads(MATCHING_ASSETS.read_text())
+
+    executable_total = executable["total_bytes"]
+    executable_matched = sum(int(item["size"], 0) for item in padding["ranges"])
+    ledger_by_path = {item["path"]: item for item in ledger["files"]}
+    matched_by_category: dict[str, int] = {}
+    for unit in matching["units"]:
+        item = ledger_by_path.get(unit["path"])
+        if item is None:
+            raise ValueError(f"matching asset is absent from ledger: {unit['path']}")
+        if item["size"] != int(unit["size"]):
+            raise ValueError(f"matching asset size differs from ledger: {unit['path']}")
+        category = item["category"]
+        matched_by_category[category] = matched_by_category.get(category, 0) + item["size"]
+
+    category_totals: dict[str, int] = {}
+    for item in ledger["files"]:
+        category = item["category"]
+        category_totals[category] = category_totals.get(category, 0) + item["size"]
+    categories = {
+        category: (total, matched_by_category.get(category, 0))
+        for category, total in category_totals.items()
+    }
+    return (executable_total, executable_matched, ledger["total_bytes"],
+            sum(matched_by_category.values()), categories)
 
 
 def canonical_functions() -> list[dict]:
@@ -132,16 +181,47 @@ def build_report() -> dict:
         })
 
     total_bytes = sum(function["size"] for function in functions)
-    aggregate = measures(total_bytes, matched_bytes, len(functions), len(matched))
+    executable_total, executable_matched, asset_total, asset_matched, asset_categories = (
+        noncode_progress()
+    )
+    aggregate = measures(
+        total_bytes, matched_bytes, len(functions), len(matched),
+        total_data=executable_total + asset_total,
+        matched_data=executable_matched + asset_matched,
+    )
+    categories = [{
+        "id": "game",
+        "name": "Game code",
+        "measures": measures(total_bytes, matched_bytes, len(functions), len(matched)),
+    }, {
+        "id": "executable_data",
+        "name": "Executable data",
+        "measures": data_measures(executable_total, executable_matched),
+    }, {
+        "id": "disc_assets",
+        "name": "Disc assets",
+        "measures": data_measures(asset_total, asset_matched),
+    }]
+    labels = {
+        "missions": "Missions",
+        "level_scripts": "Level scripts",
+        "recordings": "Recordings",
+        "movies": "Movies",
+        "padding": "Disc padding",
+        "configuration": "Configuration",
+        "unknown": "Unclassified assets",
+    }
+    for category, (total, matched_bytes_in_category) in sorted(asset_categories.items()):
+        categories.append({
+            "id": f"assets_{category}",
+            "name": labels.get(category, category.replace("_", " ").title()),
+            "measures": data_measures(total, matched_bytes_in_category),
+        })
     return {
         "measures": aggregate,
         "units": units,
         "version": 2,
-        "categories": [{
-            "id": "game",
-            "name": "Game code",
-            "measures": aggregate,
-        }],
+        "categories": categories,
     }
 
 

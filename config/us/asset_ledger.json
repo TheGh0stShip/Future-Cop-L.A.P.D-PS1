@@ -1,0 +1,416 @@
+{
+  "classification": "disc filesystem assets excluding the boot executable",
+  "files": [
+    {
+      "category": "level_scripts",
+      "path": "CW/ALEGAL.LSC",
+      "sha256": "9aabaddd0dfb3aa32e0858fb553e1a9be4aa5e2b34682ec13de331a73deb8d3e",
+      "size": 18810
+    },
+    {
+      "category": "missions",
+      "path": "CW/FE.MIS",
+      "sha256": "0f7843eafe01eca7b9bca45aea8dc4c6558b71657fec7e97ea2d69c4b718e630",
+      "size": 1941504
+    },
+    {
+      "category": "level_scripts",
+      "path": "CW/FELD.LSC",
+      "sha256": "2e833d7d5d8d05d7a38f7cb11f5bd021ec2687e4b03a8ac46fd5ae81f4858f0d",
+      "size": 34356
+    },
+    {
+      "category": "missions",
+      "path": "CW/LAX1.MIS",
+      "sha256": "f4bfe7c74d55685b7a75b946c4555bc3702bc9a65ad00b12765d025b287aa6b0",
+      "size": 5259264
+    },
+    {
+      "category": "level_scripts",
+      "path": "CW/LAX1LD.LSC",
+      "sha256": "41d3ff737254ef885bfc48abb9c5dc67f1bb288e9b2ae181813c55131a429c4b",
+      "size": 31258
+    },
+    {
+      "category": "missions",
+      "path": "CW/LAX2.MIS",
+      "sha256": "2dede76c17148dcd5112b8ac59957e02b8202ea62ca15acd30aacd0926044b2f",
+      "size": 4694016
+    },
+    {
+      "category": "level_scripts",
+      "path": "CW/LAX2LD.LSC",
+      "sha256": "82a8c01d19585cfce2b51cf263330024015a40274b385d6d56f1c584773aac6b",
+      "size": 33156
+    },
+    {
+      "category": "missions",
+      "path": "CW/M1A1.MIS",
+      "sha256": "9de3b58b06ca5625b5f87fe7440296570dcc718700429074cf896c49e4e561bf",
+      "size": 4841472
+    },
+    {
+      "category": "level_scripts",
+      "path": "CW/M1A1LD.LSC",
+      "sha256": "c799faca581be78923b959a0eeb1a635d77625468ac02079f471bf38647e4a29",
+      "size": 34586
+    },
+    {
+      "category": "missions",
+      "path": "CW/M2C.MIS",
+      "sha256": "ce7eaba5da1c1dcca6948227ab87e32913373199af65c15c374c7e370fd53bdd",
+      "size": 5627904
+    },
+    {
+      "category": "level_scripts",
+      "path": "CW/M2CLD.LSC",
+      "sha256": "3dc7b7ae3b4c1668ad2b03e23dd1a9c1442b8edfca51f404d2d6a748fc1bdb01",
+      "size": 33120
+    },
+    {
+      "category": "recordings",
+      "path": "CW/M2C_A1.DEM",
+      "sha256": "480eeb8ae6479dd223a2441e2a1017f5048b626905d230b8fcb51179de0917ed",
+      "size": 2350
+    },
+    {
+      "category": "missions",
+      "path": "CW/M3A.MIS",
+      "sha256": "925d73a314cd761be11305dc25e1d05e4803af07bdaf0b1eed3a324a7ef77457",
+      "size": 5210112
+    },
+    {
+      "category": "level_scripts",
+      "path": "CW/M3ALD.LSC",
+      "sha256": "979925b76c13fdb36113d2a8307617dea17d3287fa164fa4749011f236a12cec",
+      "size": 32256
+    },
+    {
+      "category": "missions",
+      "path": "CW/M3B.MIS",
+      "sha256": "60826fea84fb11e093d2965d564f9707181857ebfb6227990a5a526751894909",
+      "size": 5554176
+    },
+    {
+      "category": "level_scripts",
+      "path": "CW/M3BLD.LSC",
+      "sha256": "ef3f26ec89b89b7a2bad58b03e7a53ca71debb6ff7f42f4eb7fa26eea04323bd",
+      "size": 27508
+    },
+    {
+      "category": "recordings",
+      "path": "CW/M3B_B1.DEM",
+      "sha256": "737907aa3ab7bee647026a53e579621cb200f46c781e367c56997ac8a7035e09",
+      "size": 2682
+    },
+    {
+      "category": "missions",
+      "path": "CW/M4A1.MIS",
+      "sha256": "070acf1a25763780c41f4c72562e348c27dcb2b48b1f25466dd0dbb8820556a2",
+      "size": 9068544
+    },
+    {
+      "category": "level_scripts",
+      "path": "CW/M4A1LD.LSC",
+      "sha256": "ddd4d86a755f1b9b976954bccd7d0c4cd2ddc5ad19c66f436777a7dd9ed46d68",
+      "size": 32144
+    },
+    {
+      "category": "missions",
+      "path": "CW/OV.MIS",
+      "sha256": "1543ccee8954efad5055e96e4fa2d15ad9136361aae58b011905b07ae8e48ad2",
+      "size": 5750784
+    },
+    {
+      "category": "level_scripts",
+      "path": "CW/OVLD.LSC",
+      "sha256": "175a9641b358c71a23bf48a0311d8ac4a401e89588e82f3dcedbea51ca66dcbd",
+      "size": 29678
+    },
+    {
+      "category": "missions",
+      "path": "CW/UN.MIS",
+      "sha256": "e4bded9d0ac9b5359287a76483abdfd0aa1a88dcb1f9b09dac99459531718c63",
+      "size": 6709248
+    },
+    {
+      "category": "level_scripts",
+      "path": "CW/UNLD.LSC",
+      "sha256": "dab64f6484593d80c3aad6d768c0a8bccea1a6b3dcd5067674945b6f4036c413",
+      "size": 32150
+    },
+    {
+      "category": "padding",
+      "path": "DUMMY.DAT",
+      "sha256": "f4c77051ab98f1ac6105bc3d3f284bbb9369ddaa6a64e8a333ebc1d1e2b9c76c",
+      "size": 27648000
+    },
+    {
+      "category": "movies",
+      "path": "EA_LOGO.FSV",
+      "sha256": "8e11d9175e18766ce0bc31eb504bfd6bcde21b6cacc392248e8f5284eb0377c6",
+      "size": 771144
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/BRFLAX.WVE",
+      "sha256": "cf4fd55ea9f17eaf38db34e799d357507e07fde545f309d8fe868414adc809ae",
+      "size": 5318044
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/BRFM1A1.WVE",
+      "sha256": "fd856a186a789920152e84847845dea23479db03130ff04b44a7755686d7c4ab",
+      "size": 8268676
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/BRFM2C.WVE",
+      "sha256": "c7c86a0a6fa1fdcc8e4e9911e765d690aa0b5c69245ea21a8f58955aa17d7164",
+      "size": 6828384
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/BRFM3A.WVE",
+      "sha256": "5a86b749200b4fbb496f70a890db234f1b684a9c5154f84977f884f7b72eba28",
+      "size": 7164080
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/BRFM3B.WVE",
+      "sha256": "02a7c1f10b5bfcf627afc07a7d99a8c121631cf13cb279ee670ca9606030a132",
+      "size": 6318156
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/BRFM4A1.WVE",
+      "sha256": "e9af3a16f548625aceac09079a3992ba25f16fe3811a75a571b641be77a8caa8",
+      "size": 7821780
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/BRFOV.WVE",
+      "sha256": "d890d98b955e633c5e7d78479cfd7be9d52628311e4bed90f0b433b6cf7a1972",
+      "size": 6702216
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/BRFUN.WVE",
+      "sha256": "a98dd68110f38b75a1c5c413dbedbec76decf89c2695cf52f3a6d702da114167",
+      "size": 6622152
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/CREDITS.WVE",
+      "sha256": "3c32dafe85188afaea9dfdf7fd368d926077b91c9ade12407764cb67cf1d5d38",
+      "size": 14759420
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/CWRULES.WVE",
+      "sha256": "44cde28fe3226f52fc13a429d51db94651a01fcbb329b768aabef628849181de",
+      "size": 16392700
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/INTRO.WVE",
+      "sha256": "70fb040ce718e791ed903a7490746e37f397336c75b0ddc1cc55c205b8a0c5b7",
+      "size": 11954388
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/MULTIBRF.WVE",
+      "sha256": "4226d134b65cd918b2c681f57fbe6633f61db26c016f47b90163b221d89de402",
+      "size": 14780372
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/POCONFT.WVE",
+      "sha256": "3085f1afc2ca882370f2e6316cef55afbea81778b026409cd7b4bd56c9bdb3c3",
+      "size": 3675176
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/POHK.WVE",
+      "sha256": "f982940f020f057d5631200ded8b9ad21afb088f0cb66a608c64bb11c3f8aaae",
+      "size": 6491604
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/POJOKE.WVE",
+      "sha256": "7dd2949ec630583b5811d39198dd47fe6cb7078d4ec745317dadf38b1f016826",
+      "size": 8045344
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/POLAX.WVE",
+      "sha256": "9f1f38ea7690671b6429d18a38fc5b90d12c1d923a389123a81eaa2e39c5be95",
+      "size": 5385604
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/POM1A1.WVE",
+      "sha256": "438e10120bd3e64c17c59c9e4631c3b927df68243effa8f774d1a390c0856009",
+      "size": 10290392
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/POM2C.WVE",
+      "sha256": "23662f4d57862671ad8dc995d641881bf999a824ca5af206454269c6c88b58bc",
+      "size": 6320476
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/POM3A.WVE",
+      "sha256": "b4c6c848cced6f8623f757295dcfe31ceb2b356ee7ee71905acb0dbf035906f4",
+      "size": 4612292
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/POM3B.WVE",
+      "sha256": "a04eb7ad9f8c1f379188d0d75059948be2a187a630f666c0a0ed8d53fd576f75",
+      "size": 4070472
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/POM4A1.WVE",
+      "sha256": "74a0acc2c049f7896af3dfa6b4413fda2aee6f48dc418e3bae49f2b3df397be2",
+      "size": 14113372
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/POOV.WVE",
+      "sha256": "80881edd81b15fe4eab8b50a35059ab0f3b954cf2fccb42a899331cfa4a18ef6",
+      "size": 3576808
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/POOVMP.WVE",
+      "sha256": "c3f9ca7b0676827ad740d1208c7bd1deac3d7611a7e556be65e1e3e617eb8b6b",
+      "size": 6399560
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/POSLIM.WVE",
+      "sha256": "9b04300be4cdc4ef729fd9520a68219fc8ca920724dd2002c9bb0fcdc480a15b",
+      "size": 6610100
+    },
+    {
+      "category": "movies",
+      "path": "MOVIES/POUN.WVE",
+      "sha256": "9638a97dbf41c44d6d9d5058eb2da7ac8643d17a61eb90f16bceff9e1d3ac79d",
+      "size": 3047508
+    },
+    {
+      "category": "missions",
+      "path": "PA/CONFT.MIS",
+      "sha256": "d0e32fdf3221bd3d87de036218a2477ab7b0d096bbc28497eb98b35e3cf9876e",
+      "size": 5013504
+    },
+    {
+      "category": "level_scripts",
+      "path": "PA/CONFTLD.LSC",
+      "sha256": "29f4bb84476366311aef3f0c29a78bcc2cf3d446b08d80800f10242ec2811091",
+      "size": 30846
+    },
+    {
+      "category": "level_scripts",
+      "path": "PA/CONFTPO.LSC",
+      "sha256": "b907c069723a8bdc4c3b3d5b5c37f2bde6716ecce0498e301aa19cde9028cdea",
+      "size": 32334
+    },
+    {
+      "category": "recordings",
+      "path": "PA/CONFT_A1.DEM",
+      "sha256": "d785c4e8368f71d5e077b6f62f5003e8c19ee67260e1ada70e9cb13eb4d73ad8",
+      "size": 2166
+    },
+    {
+      "category": "missions",
+      "path": "PA/HK.MIS",
+      "sha256": "0d7e812cb52fb44b041d7414e508e78e3ba82589c3696da2966b2a9204c6ef64",
+      "size": 5406720
+    },
+    {
+      "category": "level_scripts",
+      "path": "PA/HKLD.LSC",
+      "sha256": "916b829c79ae2b80f35c84ba6510202445a0cf6983bba06a743d6505523ecc51",
+      "size": 31088
+    },
+    {
+      "category": "level_scripts",
+      "path": "PA/HKPO.LSC",
+      "sha256": "8e0b5589fb4056126e7a9918e9f856c9c54c578ab23a9efda3baefaa29c159b8",
+      "size": 27436
+    },
+    {
+      "category": "missions",
+      "path": "PA/JOKE.MIS",
+      "sha256": "e6a445b710d99f061b10ce5fb734306530d8c08e83756049a21f86652649e63a",
+      "size": 5136384
+    },
+    {
+      "category": "level_scripts",
+      "path": "PA/JOKELD.LSC",
+      "sha256": "4f333614aa7671a96fe0cf6decab5115f0681aa327fceec1e9f461777489c362",
+      "size": 34438
+    },
+    {
+      "category": "level_scripts",
+      "path": "PA/JOKEPO.LSC",
+      "sha256": "a3d36c9755e2214a6473af18dd1ae19bfc86b85e37a7905fc9121df6cdd9ff2d",
+      "size": 37884
+    },
+    {
+      "category": "missions",
+      "path": "PA/OVMP.MIS",
+      "sha256": "df9f596a4e78896acc2318bd6e2c5562525cabf54c6583e86b16f1d60df6bf4f",
+      "size": 5160960
+    },
+    {
+      "category": "level_scripts",
+      "path": "PA/OVMPLD.LSC",
+      "sha256": "9a822dd809c2407e2b41cfdce3a1f45cff8208754e67f2268a46ce0b926b88b8",
+      "size": 30724
+    },
+    {
+      "category": "level_scripts",
+      "path": "PA/OVMPPO.LSC",
+      "sha256": "a512604b0ea10d89bc31f3dc19ff9f10cbae6b249b196166a35836bc2dfcb2d3",
+      "size": 33870
+    },
+    {
+      "category": "missions",
+      "path": "PA/SLIM.MIS",
+      "sha256": "b5b08ff77bae488a696661f1ec9e5eadf49355c8f5ea45cabadd0c688eb30545",
+      "size": 5210112
+    },
+    {
+      "category": "level_scripts",
+      "path": "PA/SLIMLD.LSC",
+      "sha256": "51408eabf4d9774c5df7bacf3035508a3269c8633293a3657bb6b82cd0760872",
+      "size": 32124
+    },
+    {
+      "category": "level_scripts",
+      "path": "PA/SLIMPO.LSC",
+      "sha256": "8bc42fba95641f3166afc187ba30357636b8f236ec3d0ee156a023bfb94d7c26",
+      "size": 34452
+    },
+    {
+      "category": "recordings",
+      "path": "PA/SLIM_B1.DEM",
+      "sha256": "13147f810498c8cff164e9d28924e1ea7a4104069c5e13510683c84f3522b0ce",
+      "size": 3138
+    },
+    {
+      "category": "configuration",
+      "path": "SYSTEM.CNF",
+      "sha256": "77e827fb0eb77c6223fd4c31cfab50236ada716a31262eb561d6ec495ffde3b1",
+      "size": 66
+    }
+  ],
+  "schema": 1,
+  "total_bytes": 305247544,
+  "warning": "Inventory and extraction alone award no matching progress."
+}

@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "classification": "byte-verified reproducible disc assets",
+  "units": [
+    {
+      "path": "DUMMY.DAT",
+      "kind": "padding",
+      "size": 27648000,
+      "fill": 0,
+      "sha256": "f4c77051ab98f1ac6105bc3d3f284bbb9369ddaa6a64e8a333ebc1d1e2b9c76c"
+    }
+  ]
+}

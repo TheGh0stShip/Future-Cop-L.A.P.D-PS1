@@ -7,7 +7,7 @@ VENV_PYTHON := $(VENV)/bin/python
 VENV_STAMP := $(VENV)/.installed
 EXE := baseroms/us/SLUS_007.39
 
-.PHONY: all setup toolchain verify split function-inventory verify-matching report check extract inventory offline-decomp-status clean
+.PHONY: all setup toolchain verify split function-inventory verify-matching verify-noncode report check extract inventory inventory-noncode offline-decomp-status clean
 
 all: split
 
@@ -41,10 +41,13 @@ verify-matching: verify toolchain
 	LD_LIBRARY_PATH="$(CURDIR)/.toolchain/mipsel-binutils/root/usr/lib/x86_64-linux-gnu$${LD_LIBRARY_PATH:+:$$LD_LIBRARY_PATH}" \
 	$(PYTHON) tools/verify_matching_units.py
 
+verify-noncode: verify extract
+	$(PYTHON) tools/verify_noncode.py
+
 report:
 	$(PYTHON) tools/generate_decomp_report.py
 
-check: verify function-inventory verify-matching report
+check: verify function-inventory verify-matching verify-noncode report
 	$(PYTHON) -m unittest discover -s tests -t . -v
 
 extract: $(FILES)/.extracted
@@ -64,6 +67,9 @@ inventory: extract
 	find "$(FILES)" -type f ! -name .extracted -printf '%P\t%s\n' | sort > build/inventory/files.tsv
 	find "$(FILES)" -type f ! -name .extracted -print0 | sort -z | xargs -0 sha256sum > build/inventory/sha256.txt
 	python3 tools/inspect_psx_exe.py "$(FILES)/SLUS_007.39" > build/inventory/psx-exe.txt
+
+inventory-noncode: extract
+	$(PYTHON) tools/inventory_noncode.py
 
 offline-decomp-status:
 	$(PYTHON) tools/offline_decomp.py status
