@@ -14,6 +14,36 @@
   ],
   "units": [
     {
+      "name": "func_80089DE0",
+      "address": "0x80089DE0",
+      "size": "0x20",
+      "source": "src/game/80089DE0.c",
+      "compiler": "gcc-2.7.2-cdk",
+      "link": true,
+      "linker_symbols": {"func_8008A5A8": "0x8008A5A8"},
+      "symbols": {"func_8008A5A8": "0x8008A5A8"}
+    },
+    {
+      "name": "func_80089E00",
+      "address": "0x80089E00",
+      "size": "0x20",
+      "source": "src/game/80089E00.c",
+      "compiler": "gcc-2.7.2-cdk",
+      "link": true,
+      "linker_symbols": {"func_8008A5BC": "0x8008A5BC"},
+      "symbols": {"func_8008A5BC": "0x8008A5BC"}
+    },
+    {
+      "name": "func_80089E20",
+      "address": "0x80089E20",
+      "size": "0x20",
+      "source": "src/game/80089E20.c",
+      "compiler": "gcc-2.7.2-cdk",
+      "link": true,
+      "linker_symbols": {"func_8008A688": "0x8008A688"},
+      "symbols": {"func_8008A688": "0x8008A688"}
+    },
+    {
       "name": "func_8008D784",
       "address": "0x8008D784",
       "size": "0x28",
