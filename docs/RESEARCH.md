@@ -75,3 +75,9 @@ The 56-byte shared routine at `0x8008B05C` was identified from PsyQ library
 symbol corpora as `_padGetActSize`. Its recovered C computes the controller
 command-buffer extent from fields at offsets `0xE3`, `0xE9`, and `0xEC`; the
 result passes the full retail-byte verifier.
+
+Read-only comparison with `hansbonini/psx_tomba` revision
+`fb3b36715f6966c099be95564c155bd842003b76` independently confirmed the
+LIBPAD 4.2 object ownership, signed temporary types, and the complete
+`0xF0`-byte controller-port layout. That repository was used as reference
+evidence only; no files were copied into this tree.

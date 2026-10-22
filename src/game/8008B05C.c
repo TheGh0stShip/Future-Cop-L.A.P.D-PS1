@@ -9,17 +9,27 @@ struct BufferShape {
     u32 data;
 };
 
-u32 func_8008B05C(struct BufferShape *shape)
+s32 func_8008B05C(struct BufferShape *shape)
 {
-    register s32 width __asm__("$2");
-    register u32 height __asm__("$3");
-    register u32 data __asm__("$4");
+    s32 width;
+    s32 height;
+    s32 response_bytes;
+    s32 base;
+    s32 raw_width;
+    s32 raw_height;
 
-    width = shape->width;
-    height = shape->height;
-    data = shape->data;
-    width = ((width + 1) >> 1) * 4;
-    height = (height * 5 + 3) & 0xFFC;
+    raw_width = shape->width;
+    raw_height = shape->height;
+    base = shape->data;
+
+    width = raw_width + 1;
+    width >>= 1;
+    width <<= 2;
+
+    response_bytes = (raw_height << 2) + raw_height;
+    height = (response_bytes + 3) & 0xFFC;
     height += 4;
-    return width + height + data;
+
+    width += height;
+    return width + base;
 }
