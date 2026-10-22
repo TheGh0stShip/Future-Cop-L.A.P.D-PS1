@@ -4,9 +4,12 @@ extern u8 D_8009FA8C[];
 
 void func_8005A044(void)
 {
-    s32 index;
+    u8 *cursor;
+    s32 remaining;
 
-    for (index = 1; index >= 0; index--) {
-        D_8009FA8C[index] = 0;
-    }
+    remaining = 1;
+    cursor = &D_8009FA8C[1];
+    do {
+        *cursor-- = 0;
+    } while (--remaining >= 0);
 }
