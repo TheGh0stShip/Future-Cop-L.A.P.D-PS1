@@ -171,6 +171,11 @@ Six small LIBCD entry points add another 196 verified bytes: `CdFlush`,
 Five match the Cygnus 2.7.2 SDK profile, while `CdGetSector` selects 2.8.1
 with otherwise identical object flags. The linked SDK region therefore mixes
 compiler provenance even among adjacent public API wrappers.
+
+`CdGetSector2` and the three small LIBPRESS entry points `DecDCTout`,
+`DecDCTinCallback`, and `DecDCToutCallback` contribute another 136 verified
+bytes. `CdGetSector2` selects 2.8.1 like its sibling, while the LIBPRESS
+wrappers select the Cygnus 2.7.2 `-O3` profile.
 The intervening 212-byte initializer at `0x8008B094` is `_padLoadActInfo`; it
 lays out the mode, capability, and combination tables within a caller-provided
 buffer and installs the two command-processing callbacks.
