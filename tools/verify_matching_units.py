@@ -301,19 +301,31 @@ def reuse_aspsx_initialized_zero(text):
     for offset in range(len(meaningful) - 6):
         indices = meaningful[offset:offset + 7]
         block = [lines[index].strip() for index in indices]
-        if block[0] != "addu\t$2,$0,$zero":
+        zero_init = re.fullmatch(r"addu\s+\$(\d+),\$0,\$zero", block[0])
+        side_load = re.fullmatch(r"lb\s+\$(\d+),160\(\$(\d+)\)", block[1])
+        if not zero_init or not side_load:
             continue
-        if block[1] != "lb\t$3,160($5)" or not block[2].startswith("nop"):
+        zero_register = zero_init.group(1)
+        side_register = side_load.group(1)
+        if not block[2].startswith("nop"):
             continue
-        if not re.fullmatch(r"bne\s+\$3,\$0,\$L\d+", block[3]):
+        if not re.fullmatch(
+            rf"bne\s+\${side_register},\$0,\$L\d+", block[3]
+        ):
             continue
-        if not re.fullmatch(r"li\s+\$7,0x00000001(?:\s+# 1)?", block[4]):
+        one_init = re.fullmatch(
+            r"li\s+\$(\d+),0x00000001(?:\s+# 1)?", block[4]
+        )
+        if not one_init:
             continue
+        destination = one_init.group(1)
         if not re.fullmatch(r"j\s+\$L\d+", block[5]):
             continue
-        if block[6] != "addu\t$7,$0,$zero":
+        if not re.fullmatch(
+            rf"addu\s+\${destination},\$0,\$zero", block[6]
+        ):
             continue
-        lines[indices[6]] = "addu\t$7,$2,$zero"
+        lines[indices[6]] = f"addu\t${destination},${zero_register},$zero"
         return "\n".join(lines) + "\n"
     raise ValueError("ASPSX initialized-zero reuse pattern not found")
 

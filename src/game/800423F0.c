@@ -23,15 +23,12 @@ void func_800423F0(struct Unk423F0Object *object)
     s32 last;
     s32 i;
 
+    first = 0;
+    last = 1;
     if (object->side == 0) {
-        first = 0;
-        last = 0;
+        last = first;
     } else if (object->side == 1) {
         first = 1;
-        last = 1;
-    } else {
-        first = 0;
-        last = 1;
     }
     for (i = first; i <= last; i++) {
         if (D_8009FA58[i] != 0 && D_8009FA58[i]->info != 0) {

@@ -67,6 +67,15 @@ class AspsxReorderTests(unittest.TestCase):
         expected = source.replace("addu\t$7,$0,$zero", "addu\t$7,$2,$zero")
         self.assertEqual(reuse_aspsx_initialized_zero(source), expected)
 
+    def test_reuses_initialized_zero_with_other_registers(self):
+        source = (
+            "addu\t$2,$0,$zero\nlb\t$3,160($4)\nnop\n"
+            "bne\t$3,$0,$L2\nli\t$6,0x00000001\t\t# 1\n"
+            "j\t$L3\naddu\t$6,$0,$zero\n$L2:\n"
+        )
+        expected = source.replace("addu\t$6,$0,$zero", "addu\t$6,$2,$zero")
+        self.assertEqual(reuse_aspsx_initialized_zero(source), expected)
+
     def test_reorders_vector_copy_call_setup(self):
         source = (
             "lw\t$2,D_camera\n# load delay\nlw\t$3,0($5)\n"
