@@ -12,8 +12,13 @@ struct Unk4749CHandle {
 
 s32 func_800474C4(struct Unk4749CHandle *handle)
 {
-    if (handle->resource == 0) {
-        return 0;
+    register struct Unk4749CResource *resource __asm__("$3");
+    register s32 result __asm__("$2");
+
+    resource = handle->resource;
+    result = 0;
+    if (resource != 0) {
+        result = resource->serial == handle->serial;
     }
-    return handle->resource->serial == handle->serial;
+    return result;
 }

@@ -1708,6 +1708,14 @@
       "linker_symbols": {}
     },
     {
+      "name": "func_800474C4",
+      "address": "0x800474C4",
+      "size": "0x2C",
+      "source": "src/game/800474C4.c",
+      "compiler": "gcc-2.7.2-cdk",
+      "symbols": {}
+    },
+    {
       "name": "func_80047690",
       "address": "0x80047690",
       "size": "0x40",
