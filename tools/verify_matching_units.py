@@ -1432,7 +1432,9 @@ def compile_unit(unit, config, prefix, work, environment=None):
     linked = work / "unit.elf"
     linker_script = work / "unit.ld"
     binary = work / "unit.bin"
-    flags = unit.get("compiler_flags", config["compiler_flags"])
+    rodata_binary = work / "unit.rodata.bin"
+    flags = list(unit.get("compiler_flags", config["compiler_flags"]))
+    flags.extend(unit.get("compiler_flags_extra", []))
     cpp = ROOT / ".toolchain" / compiler / "cpp"
     if not cpp.is_file():
         raise SystemExit(f"missing {cpp}; run make toolchain")
@@ -1441,6 +1443,7 @@ def compile_unit(unit, config, prefix, work, environment=None):
 
     maspsx = ROOT / ".toolchain" / f"maspsx-{MASPSX_COMMIT}" / "maspsx.py"
     maspsx_flags = list(unit.get("maspsx_flags", config["maspsx_flags"]))
+    maspsx_flags.extend(unit.get("maspsx_flags_extra", []))
     maspsx_flags.extend(
         flag for flag in flags if flag.startswith("-G") and len(flag) > 2
     )
@@ -1456,6 +1459,13 @@ def compile_unit(unit, config, prefix, work, environment=None):
     with processed.open("w") as output:
         run(["python3", maspsx, *maspsx_flags, maspsx_input],
             stdout=output, env=environment)
+    if unit.get("rewrite_move_pseudos", False):
+        processed.write_text(re.sub(
+            r"(?m)^(\s*)move\s+(\$[A-Za-z0-9]+)\s*,\s*"
+            r"(\$[A-Za-z0-9]+)(\s*(?:#.*)?)$",
+            r"\1addu\t\2,\3,$zero\4",
+            processed.read_text(),
+        ))
     if unit.get("aspsx_reorder_epilogue", False):
         processed.write_text(reorder_aspsx_return_delay_slot(processed.read_text()))
     if unit.get("aspsx_move_load_delay_label", False):
@@ -1577,7 +1587,12 @@ def compile_unit(unit, config, prefix, work, environment=None):
         linker_script.write_text(
             "SECTIONS\n{\n"
             f"  .text {address:#x} : SUBALIGN(4) {{ *(.text) }}\n"
-            "  /DISCARD/ : { *(.MIPS.abiflags) *(.reginfo) *(.pdr) "
+            + (
+                f"  .rodata {number(unit['rodata_address']):#x} : "
+                "SUBALIGN(4) { *(.rodata) }\n"
+                if "rodata_address" in unit else ""
+            )
+            + "  /DISCARD/ : { *(.MIPS.abiflags) *(.reginfo) *(.pdr) "
             "*(.gnu.attributes) }\n"
             "}\n"
         )
@@ -1593,6 +1608,9 @@ def compile_unit(unit, config, prefix, work, environment=None):
         binary_input = linked
     run([tool("objcopy", prefix), "-O", "binary", "-j", ".text", binary_input, binary],
         env=environment)
+    if "rodata_address" in unit:
+        run([tool("objcopy", prefix), "-O", "binary", "-j", ".rodata",
+             binary_input, rodata_binary], env=environment)
     return binary.read_bytes()
 
 
@@ -1620,6 +1638,25 @@ def verify(config_path, executable_path, output_path, prefix, keep_going=False):
             elif actual[:size] != expected:
                 mismatch = next(i for i in range(size) if actual[i] != expected[i])
                 failure = f"differs at +0x{mismatch:X}"
+            rodata = work / "unit.rodata.bin"
+            if failure is None and rodata.is_file():
+                rodata_address = number(unit["rodata_address"])
+                rodata_bytes = rodata.read_bytes()
+                rodata_offset = HEADER_SIZE + rodata_address - LOAD_ADDRESS
+                expected_rodata = executable[
+                    rodata_offset:rodata_offset + len(rodata_bytes)
+                ]
+                if len(expected_rodata) != len(rodata_bytes):
+                    failure = "read-only data range outside executable"
+                elif rodata_bytes != expected_rodata:
+                    mismatch = next(
+                        i for i, pair in enumerate(zip(rodata_bytes, expected_rodata))
+                        if pair[0] != pair[1]
+                    )
+                    failure = (
+                        f"read-only data differs at "
+                        f"{rodata_address + mismatch:#x}"
+                    )
             if failure is not None:
                 if not keep_going:
                     raise SystemExit(f"{unit['name']} {failure}")

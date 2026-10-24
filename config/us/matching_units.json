@@ -5822,6 +5822,28 @@
       }
     },
     {
+      "name": "func_80098FE8",
+      "address": "0x80098FE8",
+      "size": "0x37C",
+      "source": "src/game/80098FE8.c",
+      "compiler": "gcc-2.8.1-psx",
+      "compiler_flags_extra": [
+        "-mno-split-addresses"
+      ],
+      "maspsx_flags_extra": [
+        "--passthrough"
+      ],
+      "rewrite_move_pseudos": true,
+      "rodata_address": "0x80012D5C",
+      "link": true,
+      "linker_symbols": {
+        "D_8009EEA4": "0x8009EEA4"
+      },
+      "symbols": {
+        "D_8009EEA4": "0x8009EEA4"
+      }
+    },
+    {
       "name": "func_80013550",
       "address": "0x80013550",
       "size": "0x70",
