@@ -14,6 +14,21 @@
   ],
   "units": [
     {
+      "name": "func_80096748",
+      "address": "0x80096748",
+      "size": "0x610",
+      "source": "src/game/80096748.c",
+      "compiler": "gcc-2.6.3-psx",
+      "maspsx_flags": [
+        "--aspsx-version=2.08",
+        "--expand-div"
+      ],
+      "rodata_address": "0x80012BDC",
+      "symbols": {},
+      "link": true,
+      "linker_symbols": {}
+    },
+    {
       "name": "func_8008C3EC",
       "address": "0x8008C3EC",
       "size": "0x20",

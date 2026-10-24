@@ -19,8 +19,6 @@ typedef union {
     DItype ll;
 } DIunion;
 
-extern const UQItype D_80012BDC[];
-
 #define SI_TYPE_SIZE (sizeof(SItype) * 8)
 #define __BITS4 (SI_TYPE_SIZE / 4)
 #define __ll_B (1L << (SI_TYPE_SIZE / 2))
@@ -36,8 +34,8 @@ extern const UQItype D_80012BDC[];
     } while (0)
 
 #define umul_ppmm(w1, w0, u, v) \
-    __asm__(".set noreorder\n\tmultu %2,%3\n\tmflo %1\n\tmfhi %0\n\t.set reorder" \
-            : "=d"((USItype)(w1)), "=d"((USItype)(w0)) \
+    __asm__("multu %2,%3\n\tmflo %0\n\tmfhi %1" \
+            : "=d"((USItype)(w0)), "=d"((USItype)(w1)) \
             : "d"((USItype)(u)), "d"((USItype)(v)))
 
 #define udiv_qrnnd(q, r, n1, n0, d) \
@@ -72,6 +70,17 @@ extern const UQItype D_80012BDC[];
         (r) = __r0; \
     } while (0)
 
+static const UQItype __clz_tab[] = {
+    0,1,2,2,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+    6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+    7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+    7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+    8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
+    8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
+    8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
+    8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
+};
+
 #define count_leading_zeros(count, x) \
     do { \
         USItype __xr = (x); \
@@ -86,7 +95,7 @@ extern const UQItype D_80012BDC[];
                 if (((__xr >> __a) & 0xff) != 0) \
                     break; \
         } \
-        (count) = SI_TYPE_SIZE - (D_80012BDC[__xr >> __a] + __a); \
+        (count) = SI_TYPE_SIZE - (__clz_tab[__xr >> __a] + __a); \
     } while (0)
 
 UDItype func_80096748(n, d, rp)

@@ -16,23 +16,6 @@
   ],
   "units": [
     {
-      "name": "func_80096748",
-      "address": "0x80096748",
-      "size": "0x610",
-      "source": "src/game/80096748.c",
-      "maspsx_flags": [
-        "--dont-expand-li",
-        "--expand-div"
-      ],
-      "symbols": {
-        "D_80012BDC": "0x80012BDC"
-      },
-      "link": true,
-      "linker_symbols": {
-        "D_80012BDC": "0x80012BDC"
-      }
-    },
-    {
       "name": "func_800847E0",
       "address": "0x800847E0",
       "size": "0x894",
